@@ -37,6 +37,7 @@ class _MyStaggeredTileState extends State<MyStaggeredTile> {
           borderRadius: BorderRadius.all(Radius.circular(8))),
       padding: EdgeInsets.all(8),
       child:  constructChild(),) ,
+      //child:Text("data"),),
     );
   }
 
