@@ -3,6 +3,7 @@ import 'StaggeredView.dart';
 import '../Models/Note.dart';
 import 'NotePage.dart';
 import '../Models/Utility.dart';
+import '../Models/FabBottomAppBar.dart';
 
 enum viewType { List, Staggered }
 
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var notesViewType;
+  String _lastSelected = 'TAB: 0';
   @override
   void initState() {
     notesViewType = viewType.Staggered;
@@ -37,8 +39,16 @@ class _HomePageState extends State<HomePage> {
         top: true,
         bottom: true,
       ),
-      bottomSheet: _bottomBar(),
+      //bottomSheet: _bottomBar(),
       //floatingActionButtonLocation: FloatingActionButtonLocation.endTop
+      bottomNavigationBar: _bulidBottomNavBar(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      //floatingActionButton: _buildFab(context),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: Colors.black,
+        onPressed: () {},
+      ),
     );
   }
 
@@ -73,6 +83,31 @@ class _HomePageState extends State<HomePage> {
         // ),
         //onPressed: () => _newNoteTapped(context),
         // )
+      ],
+    );
+  }
+
+  void _selectedFab(int index) {
+    setState(() {
+      _lastSelected = 'FAB: $index';
+    });
+  }
+
+  Widget _bulidBottomNavBar() {
+    return FABBottomAppBar(
+      height: 50,
+      iconSize: 19,
+      backgroundColor: Colors.grey,
+      //centerItemText: 'A',
+      color: Colors.white,
+      selectedColor: Colors.black,
+      notchedShape: CircularNotchedRectangle(),
+      onTabSelected: _selectedFab,
+      items: [
+        FABBottomAppBarItem(iconData: Icons.settings),
+        FABBottomAppBarItem(iconData: Icons.restore_from_trash, text: 'Trash'),
+        FABBottomAppBarItem(iconData: Icons.note, text: 'Note'),
+        FABBottomAppBarItem(iconData: Icons.archive, text: 'Archive'),
       ],
     );
   }
