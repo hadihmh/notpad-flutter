@@ -8,11 +8,13 @@ import '../Models/FabBottomAppBar.dart';
 enum viewType { List, Staggered }
 
 class HomePage extends StatefulWidget {
+  
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  
   var notesViewType;
   String _lastSelected = 'TAB: 0';
   @override
@@ -24,14 +26,16 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
-      appBar: AppBar(
-        brightness: Brightness.light,
-        actions: _appBarActions(),
-        elevation: 1,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text("Notes"),
-      ),
+      // appBar: AppBar(
+      //   brightness: Brightness.light,
+      //   //actions: _appBarActions(),
+      //   // actions: <Widget>[RaisedButton(onPressed: (){onpresswid();},child: Icon(Icons.add),)],
+        
+      //   elevation: 1,
+      //   backgroundColor: Colors.white,
+      //   centerTitle: true,
+      //   title: Text("Notes"),
+      // ),
       body: SafeArea(
         child: _body(),
         right: true,
@@ -46,9 +50,11 @@ class _HomePageState extends State<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       //floatingActionButton: _buildFab(context),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: Icon(Icons.create),
         backgroundColor: Colors.black,
-        onPressed: () {},
+        onPressed: () {
+          _newNoteTapped(context);
+        },
       ),
     );
   }
@@ -96,6 +102,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _bulidBottomNavBar() {
     return FABBottomAppBar(
+      
       height: 40,
       iconSize: 19,
       backgroundColor: Colors.grey,
@@ -108,7 +115,7 @@ class _HomePageState extends State<HomePage> {
         //FABBottomAppBarItem(iconData: Icons.settings),
         // FABBottomAppBarItem(iconData: Icons.restore_from_trash, text: 'Trash'),
         FABBottomAppBarItem(iconData: Icons.archive),
-         FABBottomAppBarItem(iconData: Icons.note),
+         FABBottomAppBarItem(iconData: Icons.receipt),
         
       ],
     );

@@ -6,18 +6,19 @@ import '../screens/auth_page.dart';
 import '../screens/calendar_page.dart';
 import '../screens/main_page.dart';
 import '../utils/class_builder.dart';
+import './HomePage.dart';
 
 
 
-class MainWidget extends StatefulWidget {
-  MainWidget({Key key, this.title}) : super(key: key);
+class DrawerPage extends StatefulWidget {
+  DrawerPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _MainWidgetState createState() => _MainWidgetState();
+  _DrawerPageState createState() => _DrawerPageState();
 }
 
-class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
+class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
   KFDrawerController _drawerController;
 
   @override
@@ -27,24 +28,24 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
       initialPage: ClassBuilder.fromString('MainPage'),
       items: [
         KFDrawerItem.initWithPage(
-          text: Text('MAIN', style: TextStyle(color: Colors.white)),
-          icon: Icon(Icons.home, color: Colors.white),
+          text: Text('New Note', style: TextStyle(color: Colors.white)),
+          icon: Icon(Icons.note, color: Colors.black),
           page: MainPage(),
         ),
         KFDrawerItem.initWithPage(
           text: Text(
-            'CALENDAR',
+            'Trash',
             style: TextStyle(color: Colors.white),
           ),
-          icon: Icon(Icons.add, color: Colors.red),
+          icon: Icon(Icons.restore_from_trash, color: Colors.black),
           page: CalendarPage(),
         ),
         KFDrawerItem.initWithPage(
           text: Text(
-            'SETTINGS',
+            'Settins',
             style: TextStyle(color: Colors.white),
           ),
-          icon: Icon(Icons.settings, color: Colors.white),
+          icon: Icon(Icons.settings, color: Colors.black),
           page: ClassBuilder.fromString('SettingsPage'),
         ),
       ],
@@ -64,20 +65,24 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             width: MediaQuery.of(context).size.width * 0.6,
-            child: Image.asset(
-              'Assets/back.jpg',
-              alignment: Alignment.centerLeft,
-            ),
+            child: Image.asset("Assets/logo2.png",height: 150,width: 150,),
+          //   child:CircleAvatar(backgroundImage: AssetImage(
+          //     'Assets/logo.jpg',
+              
+              
+          //     //alignment: Alignment.centerLeft,
+          //   ),minRadius: 50,
+          // maxRadius: 90,)
           ),
         ),
         footer: KFDrawerItem(
           text: Text(
-            'SIGN IN',
-            style: TextStyle(color: Colors.white),
+            'Help & Feedback',
+            style: TextStyle(color: Colors.black),
           ),
           icon: Icon(
-            Icons.input,
-            color: Colors.white,
+            Icons.help_outline,
+            color: Colors.black,
           ),
           onPressed: () {
             Navigator.of(context).push(CupertinoPageRoute(
@@ -92,7 +97,7 @@ class _MainWidgetState extends State<MainWidget> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color.fromRGBO(255, 255, 25, 1.0), Color.fromRGBO(25 , 255, 25, 1.0)],
+            colors: [Color.fromRGBO(191, 204, 194, 1.0), Color.fromRGBO(85  , 85, 85, 1.0)],
             //colors: [Colors.green],
             tileMode: TileMode.repeated,
           ),

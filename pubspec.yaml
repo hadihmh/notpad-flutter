@@ -30,6 +30,10 @@ dependencies:
   intl: ^0.15.7
   share: ^0.6.1
   kf_drawer: ^1.1.1
+  eva_icons_flutter: ^2.0.0
+  material_design_icons_flutter: ^3.2.3695
+  flutter_icons: ^0.1.4
+  line_awesome_icons: ^1.0.4+1
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +66,8 @@ flutter:
   assets:
      - Assets/Fonts/Roboto-Regular.ttf
      - Assets/back.jpg
+     - Assets/logo.jpg
+     - Assets/logo2.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

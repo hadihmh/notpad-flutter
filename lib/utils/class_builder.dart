@@ -1,6 +1,7 @@
 import '../screens/calendar_page.dart';
 import '../screens/main_page.dart';
 import '../screens/settings_page.dart';
+import '../ViewControllers/HomePage.dart';
 
 typedef T Constructor<T>();
 
@@ -15,6 +16,7 @@ class ClassBuilder {
     register<MainPage>(() => MainPage());
     register<CalendarPage>(() => CalendarPage());
     register<SettingsPage>(() => SettingsPage());
+    register<HomePage>(()=>HomePage());
   }
 
   static dynamic fromString(String type) {
