@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> {
       //bottomSheet: _bottomBar(),
       //floatingActionButtonLocation: FloatingActionButtonLocation.endTop
       bottomNavigationBar: _bulidBottomNavBar(),
+      
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       //floatingActionButton: _buildFab(context),
       floatingActionButton: FloatingActionButton(
@@ -95,7 +96,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _bulidBottomNavBar() {
     return FABBottomAppBar(
-      height: 50,
+      height: 40,
       iconSize: 19,
       backgroundColor: Colors.grey,
       //centerItemText: 'A',
@@ -104,10 +105,11 @@ class _HomePageState extends State<HomePage> {
       notchedShape: CircularNotchedRectangle(),
       onTabSelected: _selectedFab,
       items: [
-        FABBottomAppBarItem(iconData: Icons.settings),
-        FABBottomAppBarItem(iconData: Icons.restore_from_trash, text: 'Trash'),
-        FABBottomAppBarItem(iconData: Icons.note, text: 'Note'),
-        FABBottomAppBarItem(iconData: Icons.archive, text: 'Archive'),
+        //FABBottomAppBarItem(iconData: Icons.settings),
+        // FABBottomAppBarItem(iconData: Icons.restore_from_trash, text: 'Trash'),
+        FABBottomAppBarItem(iconData: Icons.archive),
+         FABBottomAppBarItem(iconData: Icons.note),
+        
       ],
     );
   }

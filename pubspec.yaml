@@ -29,6 +29,7 @@ dependencies:
   path:
   intl: ^0.15.7
   share: ^0.6.1
+  kf_drawer: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +61,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - Assets/Fonts/Roboto-Regular.ttf
-  #  - images/a_dot_burr.jpeg
+     - Assets/back.jpg
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -91,50 +91,47 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
     ValueChanged<int> onPressed,
   }) {
     Color color = _selectedIndex == index ? widget.selectedColor : widget.color;
-    
-    return item.text==null? Expanded(
-      
-      child: SizedBox(
-        height: widget.height,
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            onTap: () => onPressed(index),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              
-              children:  <Widget>[
-                Icon(item.iconData, color: color, size: widget.iconSize),
-                
-              ],
+
+    return item.text == null
+        ? Expanded(
+            child: SizedBox(
+              height: widget.height,
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  onTap: () => onPressed(index),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(item.iconData, color: color, size: widget.iconSize),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    ): Expanded(
-      
-      child: SizedBox(
-        height: widget.height,
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            onTap: () => onPressed(index),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              
-              children:  <Widget>[
-                Icon(item.iconData, color: color, size: widget.iconSize),
-                Text(
-                  item.text,
-                  style: TextStyle(color: color),
-                )
-              ],
+          )
+        : Expanded(
+            child: SizedBox(
+              height: widget.height,
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  onTap: () => onPressed(index),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(item.iconData, color: color, size: widget.iconSize),
+                      Text(
+                        item.text,
+                        style: TextStyle(color: color),
+                      )
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    ) ;
+          );
   }
 }
