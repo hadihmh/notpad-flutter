@@ -139,7 +139,6 @@ class NotesDBHandler {
     var data = await db.query("notes", orderBy: "date_last_edited desc",
         where: "is_archived = ?",
         whereArgs: [0]);
-<<<<<<< HEAD
     return data;
   }
 
@@ -153,14 +152,5 @@ class NotesDBHandler {
   }
 
 
-=======
-
-    return data;
-
-  }
-
-
-
->>>>>>> ed3cf3f340081e8da42efe63454d8f2b4dc945b1
 }
 
