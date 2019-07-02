@@ -3,32 +3,20 @@ import 'StaggeredView.dart';
 import '../Models/Note.dart';
 import 'NotePage.dart';
 import '../Models/Utility.dart';
+import '../Models/FabBottomAppBar.dart';
 
 enum viewType { List, Staggered }
 
 class HomePage extends StatefulWidget {
+  
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  
   var notesViewType;
-
-  Widget appBarTitle = new Text(
-    "Search Sample",
-    style: new TextStyle(color: Colors.white),
-  );
-  Icon actionIcon = new Icon(
-    Icons.search,
-    color: Colors.white,
-  );
-  final key = new GlobalKey<ScaffoldState>();
-  final TextEditingController _searchQueryController =
-      new TextEditingController();
-  List<String> _list;
-  bool _isSearching;
-  String _searchText = "";
-
+  String _lastSelected = 'TAB: 0';
   @override
   void initState() {
     notesViewType = viewType.Staggered;
@@ -37,56 +25,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('Drawer Header'),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-            ),
-            ListTile(
-              title: Text('Item 1'),
-              onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('Item 2'),
-              onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-      appBar: AppBar(
-        brightness: Brightness.light,
-        // leading: IconButton(
-        //   onPressed: (){
-        //     showSearch(context: context,delegate: SearchNote());
-        //   },
-        //   icon: Icon(Icons.search,color: Colors.black,),
-        // ),
-        actions: _appBarActions(),
-        elevation: 1,
-        //backgroundColor: Colors.white,
-        centerTitle: true,
-        title: searchCard(),
-      ),
+      resizeToAvoidBottomInset: false,
+      // appBar: AppBar(
+      //   brightness: Brightness.light,
+      //   //actions: _appBarActions(),
+      //   // actions: <Widget>[RaisedButton(onPressed: (){onpresswid();},child: Icon(Icons.add),)],
+        
+      //   elevation: 1,
+      //   backgroundColor: Colors.white,
+      //   centerTitle: true,
+      //   title: Text("Notes"),
+      // ),
       body: SafeArea(
         child: _body(),
         right: true,
@@ -94,67 +43,19 @@ class _HomePageState extends State<HomePage> {
         top: true,
         bottom: true,
       ),
-      bottomSheet: _bottomBar(),
-    );
-  }
-
-  Widget searchCard() => Padding(
-        padding: const EdgeInsets.all(1.0),
-        child: Card(
-          elevation: 2.0,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 1,horizontal: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  Icons.search,
-                  color: Colors.black,
-                ),
-                SizedBox(
-                  width: 5.0,
-                ),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Search your notes ..."),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-
-  Widget _buildAppbar(BuildContext context) {
-    return AppBar(
-      centerTitle: true,
-      title: appBarTitle,
-      actions: <Widget>[
-        IconButton(
-          icon: actionIcon,
-          onPressed: () {
-            setState(() {
-              if (actionIcon == Icon(Icons.search)) {
-                actionIcon = Icon(
-                  Icons.clear,
-                  color: Colors.black,
-                );
-                appBarTitle = TextField(
-                  controller: _searchQueryController,
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Search...',
-                  ),
-                );
-              }
-            });
-          },
-        )
-      ],
+      //bottomSheet: _bottomBar(),
+      //floatingActionButtonLocation: FloatingActionButtonLocation.endTop
+      bottomNavigationBar: _bulidBottomNavBar(),
+      
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      //floatingActionButton: _buildFab(context),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.create),
+        backgroundColor: Colors.black,
+        onPressed: () {
+          _newNoteTapped(context);
+        },
+      ),
     );
   }
 
@@ -168,15 +69,54 @@ class _HomePageState extends State<HomePage> {
 
   Widget _bottomBar() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        FlatButton(
-          child: Text(
-            "New Note\n",
-            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+        Padding(
+          padding: EdgeInsets.all(30),
+          child: FloatingActionButton(
+            onPressed: () {
+              _newNoteTapped(context);
+            },
+            child: Icon(Icons.add),
+            backgroundColor: Colors.grey,
           ),
-          onPressed: () => _newNoteTapped(context),
-        )
+        ),
+
+        //FlatButton(
+
+        // child: Text(
+        //   "New Note\n",
+        //   style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+        // ),
+        //onPressed: () => _newNoteTapped(context),
+        // )
+      ],
+    );
+  }
+
+  void _selectedFab(int index) {
+    setState(() {
+      _lastSelected = 'FAB: $index';
+    });
+  }
+
+  Widget _bulidBottomNavBar() {
+    return FABBottomAppBar(
+      
+      height: 40,
+      iconSize: 19,
+      backgroundColor: Colors.grey,
+      //centerItemText: 'A',
+      color: Colors.white,
+      selectedColor: Colors.black,
+      notchedShape: CircularNotchedRectangle(),
+      onTabSelected: _selectedFab,
+      items: [
+        //FABBottomAppBarItem(iconData: Icons.settings),
+        // FABBottomAppBarItem(iconData: Icons.restore_from_trash, text: 'Trash'),
+        FABBottomAppBarItem(iconData: Icons.archive),
+         FABBottomAppBarItem(iconData: Icons.receipt),
+        
       ],
     );
   }
