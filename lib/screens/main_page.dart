@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:demo_13/Models/Note.dart';
 import 'package:demo_13/Models/Utility.dart';
+<<<<<<< HEAD
 import 'package:demo_13/ViewControllers/StaggeredView.dart';
+=======
+>>>>>>> ed3cf3f340081e8da42efe63454d8f2b4dc945b1
 import 'package:demo_13/Views/StaggeredTiles.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -108,6 +111,7 @@ class _MainPageState extends State<MainPage> {
                   width: 5.0,
                 ),
                 Expanded(
+<<<<<<< HEAD
                   child: TextField(
                     onChanged: (text) {
                       StaggeredGridPage(
@@ -120,12 +124,25 @@ class _MainPageState extends State<MainPage> {
                         hintText: "Search your notes..."),
                   ),
                 ),
+=======
+                    child: TextField(
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Search your notes..."),
+                    ),
+                  ),
+                
+>>>>>>> ed3cf3f340081e8da42efe63454d8f2b4dc945b1
               ],
             ),
           ),
         ),
       );
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ed3cf3f340081e8da42efe63454d8f2b4dc945b1
 // #region AlertBox
   Future<void> _neverSatisfied() async {
     return showDialog<void>(
@@ -156,5 +173,56 @@ class _MainPageState extends State<MainPage> {
   }
 
 // #endregion
+<<<<<<< HEAD
 
+=======
+  
+  
+  List<StaggeredTile> _tilesForView() {
+    // Generate staggered tiles for the view based on the current preference.
+    return List.generate(_allNotesInQueryResult.length, (index) {
+      return StaggeredTile.fit(1);
+    });
+  }
+
+  EdgeInsets _paddingForView(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double padding;
+    double top_bottom = 8;
+    if (width > 500) {
+      padding = (width) * 0.05; // 5% padding of width on both side
+    } else {
+      padding = 8;
+    }
+    return EdgeInsets.only(
+        left: padding, right: padding, top: top_bottom, bottom: top_bottom);
+  }
+
+  MyStaggeredTile _tileGenerator(int i) {
+    return MyStaggeredTile(Note(
+        _allNotesInQueryResult[i]["id"],
+        _allNotesInQueryResult[i]["title"] == null
+            ? ""
+            : utf8.decode(_allNotesInQueryResult[i]["title"]),
+        _allNotesInQueryResult[i]["content"] == null
+            ? ""
+            : utf8.decode(_allNotesInQueryResult[i]["content"]),
+        DateTime.fromMillisecondsSinceEpoch(
+            _allNotesInQueryResult[i]["date_created"] * 1000),
+        DateTime.fromMillisecondsSinceEpoch(
+            _allNotesInQueryResult[i]["date_last_edited"] * 1000),
+        Color(_allNotesInQueryResult[i]["note_color"])));
+  }
+
+  void retrieveAllNotesFromDatabase() {
+    // queries for all the notes from the database ordered by latest edited note. excludes archived notes.
+    var _testData = noteDB.selectAllNotes();
+    _testData.then((value) {
+      setState(() {
+        this._allNotesInQueryResult = value;
+        CentralStation.updateNeeded = false;
+      });
+    });
+  }
+>>>>>>> ed3cf3f340081e8da42efe63454d8f2b4dc945b1
 }
