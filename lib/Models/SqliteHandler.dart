@@ -139,11 +139,17 @@ class NotesDBHandler {
     var data = await db.query("notes", orderBy: "date_last_edited desc",
         where: "is_archived = ?",
         whereArgs: [0]);
-
     return data;
-
   }
 
+  Future<List<Map<String,dynamic>>> selectSearchNotes(String searchQuery) async {
+    final Database db = await database;
+    // query all the notes sorted by last edited
+    var data = await db.query("notes", orderBy: "date_last_edited desc",
+        where: "title = ?",
+        whereArgs: [searchQuery]);
+    return data;
+  }
 
 
 }

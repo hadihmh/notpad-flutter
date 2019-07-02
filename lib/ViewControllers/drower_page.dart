@@ -8,8 +8,6 @@ import '../screens/main_page.dart';
 import '../utils/class_builder.dart';
 import './HomePage.dart';
 
-
-
 class DrawerPage extends StatefulWidget {
   DrawerPage({Key key, this.title}) : super(key: key);
   final String title;
@@ -51,9 +49,11 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
       ],
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: KFDrawer(
 //        borderRadius: 0.0,
 //        shadowBorderRadius: 0.0,
@@ -65,14 +65,17 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             width: MediaQuery.of(context).size.width * 0.6,
-            child: Image.asset("Assets/logo2.png",height: 150,width: 150,),
-          //   child:CircleAvatar(backgroundImage: AssetImage(
-          //     'Assets/logo.jpg',
-              
-              
-          //     //alignment: Alignment.centerLeft,
-          //   ),minRadius: 50,
-          // maxRadius: 90,)
+            child: Image.asset(
+              "Assets/logo2.png",
+              height: 150,
+              width: 150,
+            ),
+            //   child:CircleAvatar(backgroundImage: AssetImage(
+            //     'Assets/logo.jpg',
+
+            //     //alignment: Alignment.centerLeft,
+            //   ),minRadius: 50,
+            // maxRadius: 90,)
           ),
         ),
         footer: KFDrawerItem(
@@ -97,7 +100,10 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color.fromRGBO(191, 204, 194, 1.0), Color.fromRGBO(85  , 85, 85, 1.0)],
+            colors: [
+              Color.fromRGBO(191, 204, 194, 1.0),
+              Color.fromRGBO(85, 85, 85, 1.0)
+            ],
             //colors: [Colors.green],
             tileMode: TileMode.repeated,
           ),

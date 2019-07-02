@@ -8,8 +8,10 @@ import '../Views/StaggeredTiles.dart';
 import 'HomePage.dart';
 
 class StaggeredGridPage extends StatefulWidget {
+  final String searchQuery;
   final notesViewType;
-  const StaggeredGridPage({Key key, this.notesViewType}) : super(key: key);
+  const StaggeredGridPage({Key key, this.notesViewType, this.searchQuery})
+      : super(key: key);
   @override
   _StaggeredGridPageState createState() => _StaggeredGridPageState();
 }
@@ -40,20 +42,21 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
       retrieveAllNotesFromDatabase();
     }
     return Container(
-        child: Padding(
-      padding: _paddingForView(context),
-      child: new StaggeredGridView.count(
-        key: _stagKey,
-        crossAxisSpacing: 6,
-        mainAxisSpacing: 6,
-        crossAxisCount: _colForStaggeredView(context),
-        children: List.generate(_allNotesInQueryResult.length, (i) {
-         // return null;
-          return _tileGenerator(i);
-        }),
-        staggeredTiles: _tilesForView(),
+      child: Padding(
+        padding: _paddingForView(context),
+        child: new StaggeredGridView.count(
+          key: _stagKey,
+          crossAxisSpacing: 6,
+          mainAxisSpacing: 6,
+          crossAxisCount: _colForStaggeredView(context),
+          children: List.generate(_allNotesInQueryResult.length, (i) {
+            // return null;
+            return _tileGenerator(i);
+          }),
+          staggeredTiles: _tilesForView(),
+        ),
       ),
-    ));
+    );
   }
 
   int _colForStaggeredView(BuildContext context) {
@@ -100,7 +103,8 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
 
   void retrieveAllNotesFromDatabase() {
     // queries for all the notes from the database ordered by latest edited note. excludes archived notes.
-    var _testData = noteDB.selectAllNotes();
+    var _testData =
+        (widget.searchQuery == null) ? noteDB.selectAllNotes() : noteDB.selectSearchNotes(widget.searchQuery);
     _testData.then((value) {
       setState(() {
         this._allNotesInQueryResult = value;
