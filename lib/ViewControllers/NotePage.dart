@@ -1,4 +1,6 @@
+import 'package:demo_13/ViewControllers/HomePage.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../Models/Note.dart';
 import '../Models/SqliteHandler.dart';
 import 'dart:async';
@@ -7,6 +9,8 @@ import '../Views/MoreOptionsSheet.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
+
+import 'drower_page.dart';
 
 class NotePage extends StatefulWidget {
   final Note noteInEditing;
@@ -66,27 +70,29 @@ class _NotePageState extends State<NotePage> {
     final double deviceHeight = MediaQuery.of(context).size.height;
     final double deviceWidth = MediaQuery.of(context).size.width;
     if (_editableNote.id == -1 && _editableNote.title.isEmpty) {
-      FocusScope.of(context).requestFocus(_titleFocus);
+      FocusScope.of(context).requestFocus(_contentFocus);
     }
 
     return WillPopScope(
-      child: Scaffold(
-        //resizeToAvoidBottomInset: false,
-        key: _globalKey,
-        appBar: AppBar(
-          brightness: Brightness.light,
-          leading: BackButton(
-            color: Colors.black,
+        child: Scaffold(
+          //resizeToAvoidBottomInset: false,
+          key: _globalKey,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            brightness: Brightness.light,
+            leading: IconButton(onPressed:_readyToPop ,icon: Icon(MdiIcons.backburger,color: Colors.black,),),
+            actions: _archiveAction(context),
+            elevation: 1,
+            backgroundColor: note_color,
+            title: _pageTitle(),
           ),
-          actions: _archiveAction(context),
-          elevation: 1,
-          backgroundColor: note_color,
-          title: _pageTitle(),
+          body: _body(context, deviceHeight, deviceWidth),
         ),
-        body: _body(context, deviceHeight, deviceWidth),
-      ),
-      onWillPop: _readyToPop,
-    );
+        onWillPop: () async => Future.value(false)
+        // Navigator.push(
+        // context, MaterialPageRoute(builder: (context) => DrawerPage()));
+
+        );
   }
 
   Widget _body(BuildContext ctx, double deviceHeight, double deviceWidth) {
@@ -320,7 +326,8 @@ class _NotePageState extends State<NotePage> {
                       CentralStation.updateNeeded = true;
 
                       Navigator.of(context).pop();
-                      showToast("Deleted !", gravity: Toast.BOTTOM,duration: 2);
+                      showToast("Deleted !",
+                          gravity: Toast.BOTTOM, duration: 2);
                     },
                     child: Text("Yes")),
                 FlatButton(
@@ -366,7 +373,9 @@ class _NotePageState extends State<NotePage> {
 
     _persistData();
     //print("salllllllllllllllllllllllllllll");
-    return true;
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => DrawerPage()));
+    //return true;
   }
 
   void _archivePopup(BuildContext context) {
@@ -411,7 +420,7 @@ class _NotePageState extends State<NotePage> {
     Navigator.of(context).pop(); // pop back to staggered view
     // TODO: OPTIONAL show the toast of deletion completion
     // Scaffold.of(context).showSnackBar(new SnackBar(content: Text("deleted")));
-    showToast("Archived !", gravity: Toast.BOTTOM,duration: 2);
+    showToast("Archived !", gravity: Toast.BOTTOM, duration: 2);
   }
 
   void showToast(String msg, {int duration, int gravity}) {
@@ -423,7 +432,6 @@ class _NotePageState extends State<NotePage> {
       Clipboard.setData(new ClipboardData(text: _editableNote.content));
       //Navigator.of(_globalKey.currentContext).pop();
       _displaySnackBar('Note Copied To Clipboard ! ');
-      
     }
     // var noteDB = NotesDBHandler();
     // Note copy = Note(-1, _editableNote.title, _editableNote.content,

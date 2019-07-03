@@ -1,3 +1,4 @@
+import 'package:demo_13/Models/Note.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kf_drawer/kf_drawer.dart';
@@ -7,6 +8,8 @@ import '../screens/calendar_page.dart';
 import '../screens/main_page.dart';
 import '../utils/class_builder.dart';
 import './HomePage.dart';
+import '../Models/PlaceHolder.dart';
+import 'NotePage.dart';
 
 class DrawerPage extends StatefulWidget {
   DrawerPage({Key key, this.title}) : super(key: key);
@@ -29,6 +32,8 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
           text: Text('New Note', style: TextStyle(color: Colors.white)),
           icon: Icon(Icons.note, color: Colors.black),
           page: MainPage(),
+          onPressed: (){
+            _newNoteTapped(PlaceHolder.homePageContext);},
         ),
         KFDrawerItem.initWithPage(
           text: Text(
@@ -49,7 +54,13 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
       ],
     );
   }
-
+void _newNoteTapped(BuildContext ctx) {
+    // "-1" id indicates the note is not new
+    var emptyNote =
+        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white);
+    Navigator.push(
+        ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

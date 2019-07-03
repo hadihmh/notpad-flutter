@@ -47,7 +47,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    PlaceHolder.homePageContext=context;
+    return WillPopScope(
+        child: Scaffold(
+      
       resizeToAvoidBottomPadding: false,
       // appBar: AppBar(
       //   brightness: Brightness.light,
@@ -60,6 +63,7 @@ class _HomePageState extends State<HomePage> {
       //   title: Text("Notes"),
       // ),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.grey,
         
         centerTitle: true,
@@ -85,7 +89,8 @@ class _HomePageState extends State<HomePage> {
           _newNoteTapped(context);
         },
       ),
-    );
+    ),
+    onWillPop: () async => Future.value(false));
   }
 
   Widget _body() {
