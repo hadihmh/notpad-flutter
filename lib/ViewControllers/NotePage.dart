@@ -6,6 +6,7 @@ import '../Models/Utility.dart';
 import '../Views/MoreOptionsSheet.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
+import 'package:toast/toast.dart';
 
 class NotePage extends StatefulWidget {
   final Note noteInEditing;
@@ -26,6 +27,7 @@ class _NotePageState extends State<NotePage> {
   String _titleFrominitial;
   String _contentFromInitial;
   DateTime _lastEditedForUndo;
+  //BuildContext contextForSnak;
 
   var _editableNote;
 
@@ -58,6 +60,9 @@ class _NotePageState extends State<NotePage> {
 
   @override
   Widget build(BuildContext context) {
+    //contextForSnak=context;
+
+    //final key = new GlobalKey<ScaffoldState>();
     final double deviceHeight = MediaQuery.of(context).size.height;
     final double deviceWidth = MediaQuery.of(context).size.width;
     if (_editableNote.id == -1 && _editableNote.title.isEmpty) {
@@ -87,7 +92,7 @@ class _NotePageState extends State<NotePage> {
   Widget _body(BuildContext ctx, double deviceHeight, double deviceWidth) {
     return Container(
         color: note_color,
-        padding: EdgeInsets.only(left: 16, right: 16, top: 12),
+        padding: EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 20),
         child: SafeArea(
           child: ListView(
             // mainAxisAlignment: MainAxisAlignment.start,
@@ -190,6 +195,7 @@ class _NotePageState extends State<NotePage> {
         child: InkWell(
           child: GestureDetector(
             onTap: () => bottomSheet(context),
+            // onTap: () => _showWarningDailog(context),
             child: Icon(
               Icons.more_vert,
               color: CentralStation.fontColor,
@@ -281,23 +287,23 @@ class _NotePageState extends State<NotePage> {
           }
           break;
         }
-      case moreOptions.share:
-        {
-          if (_editableNote.content.isNotEmpty) {
-            Share.share("${_editableNote.title}\n${_editableNote.content}");
-          }
-          break;
-        }
+
       case moreOptions.copy:
         {
           _copy();
           break;
         }
+      default:
+        {
+          //statements;
+        }
+        break;
     }
   }
 
   void _deleteNote(BuildContext context) {
     if (_editableNote.id != -1) {
+      //_showWarningDailog(_globalKey.currentContext);
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -314,6 +320,7 @@ class _NotePageState extends State<NotePage> {
                       CentralStation.updateNeeded = true;
 
                       Navigator.of(context).pop();
+                      showToast("Deleted !", gravity: Toast.BOTTOM,duration: 2);
                     },
                     child: Text("Yes")),
                 FlatButton(
@@ -345,6 +352,7 @@ class _NotePageState extends State<NotePage> {
 
   void _saveAndStartNewNote(BuildContext context) {
     _persistenceTimer.cancel();
+    _persistData();
     var emptyNote =
         new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white);
     Navigator.of(context).pop();
@@ -357,6 +365,7 @@ class _NotePageState extends State<NotePage> {
     //show saved toast after calling _persistData function.
 
     _persistData();
+    //print("salllllllllllllllllllllllllllll");
     return true;
   }
 
@@ -401,21 +410,44 @@ class _NotePageState extends State<NotePage> {
 
     Navigator.of(context).pop(); // pop back to staggered view
     // TODO: OPTIONAL show the toast of deletion completion
-    Scaffold.of(context).showSnackBar(new SnackBar(content: Text("deleted")));
+    // Scaffold.of(context).showSnackBar(new SnackBar(content: Text("deleted")));
+    showToast("Archived !", gravity: Toast.BOTTOM,duration: 2);
+  }
+
+  void showToast(String msg, {int duration, int gravity}) {
+    Toast.show(msg, context, duration: duration, gravity: gravity);
   }
 
   void _copy() {
-    var noteDB = NotesDBHandler();
-    Note copy = Note(-1, _editableNote.title, _editableNote.content,
-        DateTime.now(), DateTime.now(), _editableNote.note_color);
+    if (_editableNote.id != -1) {
+      Clipboard.setData(new ClipboardData(text: _editableNote.content));
+      //Navigator.of(_globalKey.currentContext).pop();
+      _displaySnackBar('Note Copied To Clipboard ! ');
+      
+    }
+    // var noteDB = NotesDBHandler();
+    // Note copy = Note(-1, _editableNote.title, _editableNote.content,
+    //     DateTime.now(), DateTime.now(), _editableNote.note_color);
 
-    var status = noteDB.copyNote(copy);
-    status.then((query_success) {
-      if (query_success) {
-        CentralStation.updateNeeded = true;
-        Navigator.of(_globalKey.currentContext).pop();
-      }
-    });
+    // var status = noteDB.copyNote(copy);
+    // status.then((query_success) {
+    //   if (query_success) {
+    //     CentralStation.updateNeeded = true;
+    //     Navigator.of(_globalKey.currentContext).pop();
+    //   }
+    // });
+  }
+
+  _displaySnackBar(String showtext) {
+    final snackBar = SnackBar(
+      content: Text(
+        showtext,
+        style: TextStyle(color: Colors.white),
+      ),
+      duration: Duration(milliseconds: 400),
+      backgroundColor: Colors.black,
+    );
+    _globalKey.currentState.showSnackBar(snackBar);
   }
 
   void _undo() {

@@ -8,8 +8,10 @@ import '../Views/StaggeredTiles.dart';
 import 'HomePage.dart';
 
 class StaggeredGridPage extends StatefulWidget {
+  final searchview;
   final notesViewType;
-  const StaggeredGridPage({Key key, this.notesViewType}) : super(key: key);
+  const StaggeredGridPage({Key key, this.notesViewType, this.searchview})
+      : super(key: key);
   @override
   _StaggeredGridPageState createState() => _StaggeredGridPageState();
 }
@@ -37,7 +39,11 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
 
     print("update needed?: ${CentralStation.updateNeeded}");
     if (CentralStation.updateNeeded) {
-      retrieveAllNotesFromDatabase();
+      if (widget.searchview == null) {
+        retrieveAllNotesFromDatabase(null);
+      } else {
+        retrieveAllNotesFromDatabase(widget.searchview);
+      }
     }
     return Container(
         child: Padding(
@@ -48,7 +54,7 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
         mainAxisSpacing: 6,
         crossAxisCount: _colForStaggeredView(context),
         children: List.generate(_allNotesInQueryResult.length, (i) {
-         // return null;
+          // return null;
           return _tileGenerator(i);
         }),
         staggeredTiles: _tilesForView(),
@@ -98,14 +104,49 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
         Color(_allNotesInQueryResult[i]["note_color"])));
   }
 
-  void retrieveAllNotesFromDatabase() {
+  void retrieveAllNotesFromDatabase(String searchview) {
     // queries for all the notes from the database ordered by latest edited note. excludes archived notes.
-    var _testData = noteDB.selectAllNotes();
-    _testData.then((value) {
-      setState(() {
-        this._allNotesInQueryResult = value;
-        CentralStation.updateNeeded = false;
+    if (searchview == null) {
+      var _testData = noteDB.selectAllNotes();
+      _testData.then((value) {
+        setState(() {
+          this._allNotesInQueryResult = value;
+          CentralStation.updateNeeded = false;
+        });
       });
+    } else {
+      var _allNotes = noteDB.selectAllNotes();
+
+      _allNotes.then((value) {
+        this._allNotesInQueryResult = value;
+      });
+
+      _searchresult(searchview);
+    }
+
+    // var _testData =
+    //     (widget.searchQuery == null) ? noteDB.selectAllNotes() : noteDB.selectSearchNotes(widget.searchQuery);
+  }
+
+  void _searchresult(String valueSearch) {
+    List<Map<String, dynamic>> _foundNotesList = [];
+
+    Iterable _dfgfoundNotesList =
+        this._allNotesInQueryResult.where((Map<String, dynamic> note) {
+      String _content = utf8.decode(note['content']);
+      String _title = utf8.decode(note['title']);
+      if (_content.toLowerCase().contains(valueSearch.toLowerCase()) ||
+          _title.toLowerCase().contains(valueSearch.toLowerCase())) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    _foundNotesList = _dfgfoundNotesList.toList();
+
+    setState(() {
+      this._allNotesInQueryResult = _foundNotesList;
+      CentralStation.updateNeeded = false;
     });
   }
 }

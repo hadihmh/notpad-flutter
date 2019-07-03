@@ -38,27 +38,36 @@ class _MoreOptionsSheetState extends State<MoreOptionsSheet> {
       color: this.note_color,
       child: new Wrap(
         children: <Widget>[
+          // new Padding(
+          //   padding: EdgeInsets.only(bottom: 50),),
           new ListTile(
               leading: new Icon(Icons.delete),
-              title: new Text('Delete permanently'),
+              title: new Text('Delete Permanently'),
               onTap: () {
                 Navigator.of(context).pop();
                 widget.callBackOptionTapped(moreOptions.delete);
+                
               }),
+              
+            //   new Padding(
+            // padding: EdgeInsets.only(top: 50),),
+          // new ListTile(
+          //     leading: new Icon(Icons.content_copy),
+          //     title: new Text('Duplicate'),
+          //     onTap: () {
+          //       Navigator.of(context).pop();
+          //       widget.callBackOptionTapped(moreOptions.copy);
+          //     }),
           new ListTile(
+            
               leading: new Icon(Icons.content_copy),
-              title: new Text('Duplicate'),
+              title: new Text('Copy To Clipboard'),
               onTap: () {
                 Navigator.of(context).pop();
                 widget.callBackOptionTapped(moreOptions.copy);
+                
               }),
-          new ListTile(
-              leading: new Icon(Icons.share),
-              title: new Text('Share'),
-              onTap: () {
-                Navigator.of(context).pop();
-                widget.callBackOptionTapped(moreOptions.share);
-              }),
+              SizedBox(height:80,),
           new Padding(
             padding: EdgeInsets.only(left: 10, right: 10),
             child: SizedBox(

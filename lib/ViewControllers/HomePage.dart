@@ -1,4 +1,7 @@
+import 'package:demo_13/Models/PlaceHolder.dart';
+
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'StaggeredView.dart';
 import '../Models/Note.dart';
 import 'NotePage.dart';
@@ -8,14 +11,34 @@ import '../Models/FabBottomAppBar.dart';
 enum viewType { List, Staggered }
 
 class HomePage extends StatefulWidget {
-  
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  
+  TextEditingController searchviewlis = new TextEditingController();
+  _HomePageState() {
+    searchviewlis.addListener(() {
+      if (searchviewlis.text.isEmpty) {
+        setState(() {
+          CentralStation.updateNeeded = true;
+          searchval = null;
+          //HomePage("ok");
+        });
+      } else {
+        setState(() {
+          String ser = searchviewlis.text;
+
+          CentralStation.updateNeeded = true;
+          searchval = ser;
+          //HomePage("ok");
+        });
+      }
+    });
+  }
+
   var notesViewType;
+  String searchval;
   String _lastSelected = 'TAB: 0';
   @override
   void initState() {
@@ -30,12 +53,18 @@ class _HomePageState extends State<HomePage> {
       //   brightness: Brightness.light,
       //   //actions: _appBarActions(),
       //   // actions: <Widget>[RaisedButton(onPressed: (){onpresswid();},child: Icon(Icons.add),)],
-        
+
       //   elevation: 1,
       //   backgroundColor: Colors.white,
       //   centerTitle: true,
       //   title: Text("Notes"),
       // ),
+      appBar: AppBar(
+        backgroundColor: Colors.grey,
+        
+        centerTitle: true,
+        title: searchCard(),
+      ),
       body: SafeArea(
         child: _body(),
         right: true,
@@ -46,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       //bottomSheet: _bottomBar(),
       //floatingActionButtonLocation: FloatingActionButtonLocation.endTop
       bottomNavigationBar: _bulidBottomNavBar(),
-      
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       //floatingActionButton: _buildFab(context),
       floatingActionButton: FloatingActionButton(
@@ -64,6 +93,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
         child: StaggeredGridPage(
       notesViewType: notesViewType,
+      searchview: searchval,
     ));
   }
 
@@ -102,7 +132,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _bulidBottomNavBar() {
     return FABBottomAppBar(
-      
       height: 40,
       iconSize: 19,
       backgroundColor: Colors.grey,
@@ -112,11 +141,10 @@ class _HomePageState extends State<HomePage> {
       notchedShape: CircularNotchedRectangle(),
       onTabSelected: _selectedFab,
       items: [
-        //FABBottomAppBarItem(iconData: Icons.settings),
+        // FABBottomAppBarItem(iconData: Icons.settings),
         // FABBottomAppBarItem(iconData: Icons.restore_from_trash, text: 'Trash'),
         FABBottomAppBarItem(iconData: Icons.archive),
-         FABBottomAppBarItem(iconData: Icons.receipt),
-        
+        FABBottomAppBarItem(iconData: Icons.receipt),
       ],
     );
   }
@@ -157,5 +185,104 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     ];
+  }
+
+  Widget searchCard() => Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(2.0),
+          ),
+          elevation: 2.0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                IconButton(
+                  color: Colors.black,
+                  icon: Icon(MdiIcons.menuOpen),
+                  iconSize: 25,
+                  onPressed: () {
+                    //widget.onMenuPressed();
+                    //SearchArg.onpress=widget.onMenuPressed;
+                    PlaceHolder.onpress();
+                  },
+                ),
+                InkWell(
+                  onTap: _neverSatisfied,
+                  child: Icon(
+                    Icons.search,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(
+                  width: 5.0,
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: searchviewlis,
+                    // onChanged: (text) {
+                    //   StaggeredGridPage(
+                    //     notesViewType: viewType.Staggered,
+                    //     searchview: searchview,
+                    //   );
+                    // print('dddddddddssfa322');
+                    // },
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Search your notes..."),
+                  ),
+                ),
+                IconButton(
+                  color: Colors.black,
+                  icon: Icon(
+                    notesViewType == viewType.List
+                        ? Icons.developer_board
+                        : Icons.view_headline,
+                    color: CentralStation.fontColor,
+                  ),
+                  iconSize: 25,
+                  onPressed: () {
+                    _toggleViewType();
+                    //widget.onMenuPressed();
+                    //SearchArg.onpress=widget.onMenuPressed;
+                    //SearchArg.onpress();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+// #region AlertBox
+  Future<void> _neverSatisfied() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Rewind and remember'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('You will never be satisfied.'),
+                Text('You\’re like me. I’m never satisfied.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Regret'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

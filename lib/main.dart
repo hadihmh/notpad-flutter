@@ -6,7 +6,9 @@ import './utils/class_builder.dart';
 
 void main() {
   ClassBuilder.registerClasses();
-  //debugPaintSizeEnabled=true;
+  // debugPaintSizeEnabled=true;
+  //  debugPaintBaselinesEnabled=true;
+  // debugPaintPointersEnabled=true;
   runApp(MyApp());
 }
 
