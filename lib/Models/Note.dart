@@ -9,9 +9,9 @@ class Note {
   DateTime date_created;
   DateTime date_last_edited;
   Color note_color;
-  int is_archived = 0;
+  int is_archived ;
 
-  Note(this.id, this.title, this.content, this.date_created, this.date_last_edited,this.note_color);
+  Note(this.id, this.title, this.content, this.date_created, this.date_last_edited,this.note_color,this.is_archived);
 
 
   Map<String, dynamic> toMap(bool forUpdate) {

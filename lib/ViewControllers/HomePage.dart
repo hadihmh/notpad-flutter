@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
 
   var notesViewType;
   String searchval;
+  bool isArchive;
   String _lastSelected = 'TAB: 0';
   @override
   void initState() {
@@ -47,50 +48,49 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    PlaceHolder.homePageContext=context;
+    PlaceHolder.homePageContext = context;
     return WillPopScope(
         child: Scaffold(
-      
-      resizeToAvoidBottomPadding: false,
-      // appBar: AppBar(
-      //   brightness: Brightness.light,
-      //   //actions: _appBarActions(),
-      //   // actions: <Widget>[RaisedButton(onPressed: (){onpresswid();},child: Icon(Icons.add),)],
+          resizeToAvoidBottomPadding: false,
+          // appBar: AppBar(
+          //   brightness: Brightness.light,
+          //   //actions: _appBarActions(),
+          //   // actions: <Widget>[RaisedButton(onPressed: (){onpresswid();},child: Icon(Icons.add),)],
 
-      //   elevation: 1,
-      //   backgroundColor: Colors.white,
-      //   centerTitle: true,
-      //   title: Text("Notes"),
-      // ),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.grey,
-        
-        centerTitle: true,
-        title: searchCard(),
-      ),
-      body: SafeArea(
-        child: _body(),
-        right: true,
-        left: true,
-        top: true,
-        bottom: true,
-      ),
-      //bottomSheet: _bottomBar(),
-      //floatingActionButtonLocation: FloatingActionButtonLocation.endTop
-      bottomNavigationBar: _bulidBottomNavBar(),
+          //   elevation: 1,
+          //   backgroundColor: Colors.white,
+          //   centerTitle: true,
+          //   title: Text("Notes"),
+          // ),
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.grey,
+            centerTitle: true,
+            title: searchCard(),
+          ),
+          body: SafeArea(
+            child: _body(),
+            right: true,
+            left: true,
+            top: true,
+            bottom: true,
+          ),
+          //bottomSheet: _bottomBar(),
+          //floatingActionButtonLocation: FloatingActionButtonLocation.endTop
+          bottomNavigationBar: _bulidBottomNavBar(),
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      //floatingActionButton: _buildFab(context),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.create),
-        backgroundColor: Colors.black,
-        onPressed: () {
-          _newNoteTapped(context);
-        },
-      ),
-    ),
-    onWillPop: () async => Future.value(false));
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          //floatingActionButton: _buildFab(context),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.create),
+            backgroundColor: Colors.black,
+            onPressed: () {
+              _newNoteTapped(context);
+            },
+          ),
+        ),
+        onWillPop: () async => Future.value(false));
   }
 
   Widget _body() {
@@ -99,6 +99,7 @@ class _HomePageState extends State<HomePage> {
         child: StaggeredGridPage(
       notesViewType: notesViewType,
       searchview: searchval,
+      isArchive: PlaceHolder.isArch,
     ));
   }
 
@@ -132,6 +133,14 @@ class _HomePageState extends State<HomePage> {
   void _selectedFab(int index) {
     setState(() {
       _lastSelected = 'FAB: $index';
+      print("---------------------------------$index");
+      CentralStation.updateNeeded = true;
+      if (index == 1) {
+        PlaceHolder.isArch = false;
+      }
+      if (index == 0) {
+        PlaceHolder.isArch = true;
+      }
     });
   }
 
@@ -140,6 +149,7 @@ class _HomePageState extends State<HomePage> {
       height: 40,
       iconSize: 19,
       backgroundColor: Colors.grey,
+
       //centerItemText: 'A',
       color: Colors.white,
       selectedColor: Colors.black,
@@ -157,7 +167,7 @@ class _HomePageState extends State<HomePage> {
   void _newNoteTapped(BuildContext ctx) {
     // "-1" id indicates the note is not new
     var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white);
+        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0);
     Navigator.push(
         ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
   }

@@ -57,7 +57,7 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
 void _newNoteTapped(BuildContext ctx) {
     // "-1" id indicates the note is not new
     var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white);
+        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white,0);
     Navigator.push(
         ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
   }

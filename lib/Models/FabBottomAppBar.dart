@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Models/PlaceHolder.dart';
 
 class FABBottomAppBarItem {
   FABBottomAppBarItem({this.iconData, this.text});
@@ -35,12 +36,13 @@ class FABBottomAppBar extends StatefulWidget {
 }
 
 class FABBottomAppBarState extends State<FABBottomAppBar> {
-  int _selectedIndex = 0;
+  //int _selectedIndex = 0;
 
   _updateIndex(int index) {
     widget.onTabSelected(index);
     setState(() {
-      _selectedIndex = index;
+      //_selectedIndex = index;
+      PlaceHolder.selectedIndex= index;
     });
   }
 
@@ -92,7 +94,7 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
     int index,
     ValueChanged<int> onPressed,
   }) {
-    Color color = _selectedIndex == index ? widget.selectedColor : widget.color;
+    Color color = PlaceHolder.selectedIndex == index ? widget.selectedColor : widget.color;
 
     return item.text == null
         ? Expanded(

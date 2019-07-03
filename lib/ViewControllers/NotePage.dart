@@ -31,6 +31,8 @@ class _NotePageState extends State<NotePage> {
   String _titleFrominitial;
   String _contentFromInitial;
   DateTime _lastEditedForUndo;
+  int _isArchive;
+
   //BuildContext contextForSnak;
 
   var _editableNote;
@@ -50,6 +52,7 @@ class _NotePageState extends State<NotePage> {
 
     _titleFrominitial = widget.noteInEditing.title;
     _contentFromInitial = widget.noteInEditing.content;
+    _isArchive = widget.noteInEditing.is_archived;
 
     if (widget.noteInEditing.id == -1) {
       _isNewNote = true;
@@ -80,7 +83,13 @@ class _NotePageState extends State<NotePage> {
           appBar: AppBar(
             automaticallyImplyLeading: false,
             brightness: Brightness.light,
-            leading: IconButton(onPressed:_readyToPop ,icon: Icon(MdiIcons.backburger,color: Colors.black,),),
+            leading: IconButton(
+              onPressed: _readyToPop,
+              icon: Icon(
+                MdiIcons.backburger,
+                color: Colors.black,
+              ),
+            ),
             actions: _archiveAction(context),
             elevation: 1,
             backgroundColor: note_color,
@@ -263,6 +272,8 @@ class _NotePageState extends State<NotePage> {
     _editableNote.content = _contentController.text;
     _editableNote.title = _titleController.text;
     _editableNote.note_color = note_color;
+    _editableNote.is_archived = _isArchive;
+    // _editableNote.
     print("new content: ${_editableNote.content}");
     print(widget.noteInEditing);
     print(_editableNote);
@@ -361,7 +372,7 @@ class _NotePageState extends State<NotePage> {
     _persistenceTimer.cancel();
     _persistData();
     var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white);
+        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0);
     Navigator.of(context).pop();
     Navigator.push(
         context, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
@@ -380,22 +391,41 @@ class _NotePageState extends State<NotePage> {
 
   void _archivePopup(BuildContext context) {
     if (_editableNote.id != -1) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Confirm ?"),
-              content: Text("This note will be archived"),
-              actions: <Widget>[
-                FlatButton(
-                    onPressed: () => _archiveThisNote(context),
-                    child: Text("Yes")),
-                FlatButton(
-                    onPressed: () => {Navigator.of(context).pop()},
-                    child: Text("No"))
-              ],
-            );
-          });
+      if (_isArchive == 0) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Confirm ?"),
+                content: Text("This note will be archived !"),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () => _archiveThisNote(context),
+                      child: Text("Yes")),
+                  FlatButton(
+                      onPressed: () => {Navigator.of(context).pop()},
+                      child: Text("No"))
+                ],
+              );
+            });
+      } else if (_isArchive == 1) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Confirm ?"),
+                content: Text("This note will extract from archive !"),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () => _archiveThisNote(context),
+                      child: Text("Yes")),
+                  FlatButton(
+                      onPressed: () => {Navigator.of(context).pop()},
+                      child: Text("No"))
+                ],
+              );
+            });
+      }
     } else {
       _exitWithoutSaving(context);
     }
@@ -410,7 +440,12 @@ class _NotePageState extends State<NotePage> {
   void _archiveThisNote(BuildContext context) {
     Navigator.of(context).pop();
     // set archived flag to true and send the entire note object in the database to be updated
-    _editableNote.is_archived = 1;
+    if (_isArchive == 0) {
+      _editableNote.is_archived = 1;
+    } else if (_isArchive == 1) {
+      _editableNote.is_archived = 0;
+    }
+    
     var noteDB = NotesDBHandler();
     noteDB.archiveNote(_editableNote);
     // update will be required to remove the archived note from the staggered view

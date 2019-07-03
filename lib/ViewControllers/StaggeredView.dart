@@ -10,7 +10,9 @@ import 'HomePage.dart';
 class StaggeredGridPage extends StatefulWidget {
   final searchview;
   final notesViewType;
-  const StaggeredGridPage({Key key, this.notesViewType, this.searchview})
+  final bool isArchive;
+  const StaggeredGridPage(
+      {Key key, this.notesViewType, this.searchview, this.isArchive})
       : super(key: key);
   @override
   _StaggeredGridPageState createState() => _StaggeredGridPageState();
@@ -39,10 +41,18 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
 
     print("update needed?: ${CentralStation.updateNeeded}");
     if (CentralStation.updateNeeded) {
-      if (widget.searchview == null) {
-        retrieveAllNotesFromDatabase(null);
-      } else {
-        retrieveAllNotesFromDatabase(widget.searchview);
+      if (widget.isArchive == null || widget.isArchive == false) {
+        if (widget.searchview == null) {
+          retrieveAllNotesFromDatabase(null);
+        } else {
+          retrieveAllNotesFromDatabase(widget.searchview);
+        }
+      } else if (widget.isArchive != null || widget.isArchive == true) {
+        if (widget.searchview == null) {
+          retrieveAllArchiveFromDatabase(null);
+        } else {
+          retrieveAllArchiveFromDatabase(widget.searchview);
+        }
       }
     }
     return Container(
@@ -101,7 +111,9 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
             _allNotesInQueryResult[i]["date_created"] * 1000),
         DateTime.fromMillisecondsSinceEpoch(
             _allNotesInQueryResult[i]["date_last_edited"] * 1000),
-        Color(_allNotesInQueryResult[i]["note_color"])));
+        Color(_allNotesInQueryResult[i]["note_color"]),
+        _allNotesInQueryResult[i]['is_archived']
+        ));
   }
 
   void retrieveAllNotesFromDatabase(String searchview) {
@@ -129,6 +141,52 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
   }
 
   void _searchresult(String valueSearch) {
+    List<Map<String, dynamic>> _foundNotesList = [];
+
+    Iterable _dfgfoundNotesList =
+        this._allNotesInQueryResult.where((Map<String, dynamic> note) {
+      String _content = utf8.decode(note['content']);
+      String _title = utf8.decode(note['title']);
+      if (_content.toLowerCase().contains(valueSearch.toLowerCase()) ||
+          _title.toLowerCase().contains(valueSearch.toLowerCase())) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    _foundNotesList = _dfgfoundNotesList.toList();
+
+    setState(() {
+      this._allNotesInQueryResult = _foundNotesList;
+      CentralStation.updateNeeded = false;
+    });
+  }
+
+  void retrieveAllArchiveFromDatabase(String searchview) {
+    // queries for all the notes from the database ordered by latest edited note. excludes archived notes.
+    if (searchview == null) {
+      var _testData = noteDB.selectAllArchive();
+      _testData.then((value) {
+        setState(() {
+          this._allNotesInQueryResult = value;
+          CentralStation.updateNeeded = false;
+        });
+      });
+    } else {
+      var _allNotes = noteDB.selectAllArchive();
+
+      _allNotes.then((value) {
+        this._allNotesInQueryResult = value;
+      });
+
+      _searchArchiveResult(searchview);
+    }
+
+    // var _testData =
+    //     (widget.searchQuery == null) ? noteDB.selectAllNotes() : noteDB.selectSearchNotes(widget.searchQuery);
+  }
+
+  void _searchArchiveResult(String valueSearch) {
     List<Map<String, dynamic>> _foundNotesList = [];
 
     Iterable _dfgfoundNotesList =
