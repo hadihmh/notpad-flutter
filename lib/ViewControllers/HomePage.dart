@@ -8,7 +8,7 @@ import 'NotePage.dart';
 import '../Models/Utility.dart';
 import '../Models/FabBottomAppBar.dart';
 
-enum viewType { List, Staggered }
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -43,7 +43,8 @@ class _HomePageState extends State<HomePage> {
   String _lastSelected = 'TAB: 0';
   @override
   void initState() {
-    notesViewType = viewType.Staggered;
+    CentralStation.updateNeeded = true;
+    notesViewType = 0;
   }
 
   @override
@@ -167,7 +168,7 @@ class _HomePageState extends State<HomePage> {
   void _newNoteTapped(BuildContext ctx) {
     // "-1" id indicates the note is not new
     var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0);
+        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0,0);
     Navigator.push(
         ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
   }
@@ -175,10 +176,10 @@ class _HomePageState extends State<HomePage> {
   void _toggleViewType() {
     setState(() {
       CentralStation.updateNeeded = true;
-      if (notesViewType == viewType.List) {
-        notesViewType = viewType.Staggered;
+      if (notesViewType == 1) {
+        notesViewType = 0;
       } else {
-        notesViewType = viewType.List;
+        notesViewType = 1;
       }
     });
   }
@@ -191,7 +192,7 @@ class _HomePageState extends State<HomePage> {
           child: GestureDetector(
             onTap: () => _toggleViewType(),
             child: Icon(
-              notesViewType == viewType.List
+              notesViewType == 1
                   ? Icons.developer_board
                   : Icons.view_headline,
               color: CentralStation.fontColor,
@@ -225,13 +226,13 @@ class _HomePageState extends State<HomePage> {
                     PlaceHolder.onpress();
                   },
                 ),
-                InkWell(
-                  onTap: _neverSatisfied,
-                  child: Icon(
-                    Icons.search,
-                    color: Colors.black,
-                  ),
-                ),
+                // InkWell(
+                //   onTap: _neverSatisfied,
+                //   child: Icon(
+                //     Icons.search,
+                //     color: Colors.black,
+                //   ),
+                // ),
                 SizedBox(
                   width: 5.0,
                 ),
@@ -253,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                 IconButton(
                   color: Colors.black,
                   icon: Icon(
-                    notesViewType == viewType.List
+                    notesViewType == 1
                         ? Icons.developer_board
                         : Icons.view_headline,
                     color: CentralStation.fontColor,
@@ -273,31 +274,31 @@ class _HomePageState extends State<HomePage> {
       );
 
 // #region AlertBox
-  Future<void> _neverSatisfied() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Rewind and remember'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('You will never be satisfied.'),
-                Text('You\’re like me. I’m never satisfied.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Regret'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // Future<void> _neverSatisfied() async {
+  //   return showDialog<void>(
+  //     context: context,
+  //     barrierDismissible: false, // user must tap button!
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Rewind and remember'),
+  //         content: SingleChildScrollView(
+  //           child: ListBody(
+  //             children: <Widget>[
+  //               Text('You will never be satisfied.'),
+  //               Text('You\’re like me. I’m never satisfied.'),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           FlatButton(
+  //             child: Text('Regret'),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 }

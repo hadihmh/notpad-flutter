@@ -1,4 +1,5 @@
 import 'package:demo_13/Models/Note.dart';
+import 'package:demo_13/ViewControllers/TrashPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kf_drawer/kf_drawer.dart';
@@ -40,8 +41,13 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
             'Trash',
             style: TextStyle(color: Colors.white),
           ),
-          icon: Icon(Icons.restore_from_trash, color: Colors.black),
+          icon: Icon(Icons.delete, color: Colors.black),
           page: CalendarPage(),
+          onPressed: (){
+
+            Navigator.pushReplacement(
+        PlaceHolder.homePageContext, MaterialPageRoute(builder: (BuildContext context) => TrashPage()));
+          },
         ),
         KFDrawerItem.initWithPage(
           text: Text(
@@ -57,7 +63,7 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
 void _newNoteTapped(BuildContext ctx) {
     // "-1" id indicates the note is not new
     var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white,0);
+        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white,0,0);
     Navigator.push(
         ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
   }

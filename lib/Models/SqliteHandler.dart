@@ -5,10 +5,8 @@ import 'dart:async';
 import 'Note.dart';
 
 class NotesDBHandler {
-
   final databaseName = "notes.db";
   final tableName = "notes";
-
 
   final fieldMap = {
     "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
@@ -17,28 +15,25 @@ class NotesDBHandler {
     "date_created": "INTEGER",
     "date_last_edited": "INTEGER",
     "note_color": "INTEGER",
-    "is_archived": "INTEGER"
+    "is_archived": "INTEGER",
+    "is_deleted": "INTEGER"
   };
-
 
   static Database _database;
 
-
   Future<Database> get database async {
-    if (_database != null)
-      return _database;
+    if (_database != null) return _database;
 
     _database = await initDB();
     return _database;
   }
 
-
   initDB() async {
     var path = await getDatabasesPath();
     var dbPath = join(path, 'notes.db');
     // ignore: argument_type_not_assignable
-    Database dbConnection = await openDatabase(
-        dbPath, version: 1, onCreate: (Database db, int version) async {
+    Database dbConnection = await openDatabase(dbPath, version: 1,
+        onCreate: (Database db, int version) async {
       print("executing create query from onCreate callback");
       await db.execute(_buildCreateQuery());
     });
@@ -48,23 +43,20 @@ class NotesDBHandler {
     return dbConnection;
   }
 
-
 // build the create query dynamically using the column:field dictionary.
   String _buildCreateQuery() {
     String query = "CREATE TABLE IF NOT EXISTS ";
     query += tableName;
     query += "(";
-    fieldMap.forEach((column, field){
+    fieldMap.forEach((column, field) {
       print("$column : $field");
       query += "$column $field,";
     });
 
-
-    query = query.substring(0, query.length-1);
+    query = query.substring(0, query.length - 1);
     query += " )";
 
-   return query;
-
+    return query;
   }
 
   static Future<String> dbPath() async {
@@ -78,14 +70,16 @@ class NotesDBHandler {
     print("insert called");
 
     // Insert the Notes into the correct table.
-    await db.insert('notes',
+    await db.insert(
+      'notes',
       isNew ? note.toMap(false) : note.toMap(true),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
     if (isNew) {
       // get latest note which isn't archived, limit by 1
-      var one = await db.query("notes", orderBy: "date_last_edited desc",
+      var one = await db.query("notes",
+          orderBy: "date_last_edited desc",
           where: "is_archived = ?",
           whereArgs: [0],
           limit: 1);
@@ -95,18 +89,17 @@ class NotesDBHandler {
     return note.id;
   }
 
-
   Future<bool> copyNote(Note note) async {
     final Database db = await database;
     try {
-      await db.insert("notes",note.toMap(false), conflictAlgorithm: ConflictAlgorithm.replace);
-    } catch(Error) {
+      await db.insert("notes", note.toMap(false),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    } catch (Error) {
       print(Error);
       return false;
     }
     return true;
   }
-
 
   Future<bool> archiveNote(Note note) async {
     if (note.id != -1) {
@@ -114,47 +107,60 @@ class NotesDBHandler {
 
       int idToUpdate = note.id;
 
-      db.update("notes", note.toMap(true), where: "id = ?",
-          whereArgs: [idToUpdate]);
+      db.update("notes", note.toMap(true),
+          where: "id = ?", whereArgs: [idToUpdate]);
     }
   }
 
   Future<bool> deleteNote(Note note) async {
-    if(note.id != -1) {
-      final Database db = await database;
-      try {
-        await db.delete("notes",where: "id = ?",whereArgs: [note.id]);
-        return true;
-      } catch (Error){
-        print("Error deleting ${note.id}: ${Error.toString()}");
-        return false;
+    final Database db = await database;
+    if (note.id != -1) {
+      if (note.is_deleted == 0) {
+        note.is_deleted = 1;
+        db.update("notes", note.toMap(true),
+            where: "id = ?", whereArgs: [note.id]);
+            return true;
+      } else if (note.is_deleted == 1) {
+        try {
+          await db.delete("notes", where: "id = ?", whereArgs: [note.id]);
+          return true;
+        } catch (Error) {
+          print("Error deleting ${note.id}: ${Error.toString()}");
+          return false;
+        }
       }
     }
   }
 
-
-  Future<List<Map<String,dynamic>>> selectAllNotes() async {
+  Future<List<Map<String, dynamic>>> selectAllNotes() async {
     final Database db = await database;
     // query all the notes sorted by last edited
-    var data = await db.query("notes", orderBy: "date_last_edited desc",
+    var data = await db.query("notes",
+        orderBy: "date_last_edited desc",
         where: "is_archived = ?",
         whereArgs: [0]);
 
     return data;
-
   }
-  Future<List<Map<String,dynamic>>> selectAllArchive() async {
+  Future<List<Map<String, dynamic>>> selectAllDeletedNotes() async {
     final Database db = await database;
     // query all the notes sorted by last edited
-    var data = await db.query("notes", orderBy: "date_last_edited desc",
+    var data = await db.query("notes",
+        orderBy: "date_last_edited desc",
+        where: "is_deleted = ?",
+        whereArgs: [1]);
+
+    return data;
+  }
+
+  Future<List<Map<String, dynamic>>> selectAllArchive() async {
+    final Database db = await database;
+    // query all the notes sorted by last edited
+    var data = await db.query("notes",
+        orderBy: "date_last_edited desc",
         where: "is_archived = ?",
         whereArgs: [1]);
 
     return data;
-
   }
-
-
-
 }
-

@@ -1,4 +1,5 @@
 import 'package:demo_13/ViewControllers/HomePage.dart';
+import 'package:demo_13/ViewControllers/TrashPage.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../Models/Note.dart';
@@ -32,6 +33,7 @@ class _NotePageState extends State<NotePage> {
   String _contentFromInitial;
   DateTime _lastEditedForUndo;
   int _isArchive;
+  int _isDeleted;
 
   //BuildContext contextForSnak;
 
@@ -53,6 +55,7 @@ class _NotePageState extends State<NotePage> {
     _titleFrominitial = widget.noteInEditing.title;
     _contentFromInitial = widget.noteInEditing.content;
     _isArchive = widget.noteInEditing.is_archived;
+    _isDeleted = widget.noteInEditing.is_deleted;
 
     if (widget.noteInEditing.id == -1) {
       _isNewNote = true;
@@ -174,64 +177,103 @@ class _NotePageState extends State<NotePage> {
 
   List<Widget> _archiveAction(BuildContext context) {
     List<Widget> actions = [];
-    if (widget.noteInEditing.id != -1) {
+    if (_isDeleted == 1) {
       actions.add(Padding(
         padding: EdgeInsets.symmetric(horizontal: 12),
         child: InkWell(
           child: GestureDetector(
-            onTap: () => _undo(),
+            onTap: () => _deleteNote(context),
             child: Icon(
-              Icons.undo,
+              Icons.delete_forever,
               color: CentralStation.fontColor,
             ),
           ),
         ),
       ));
-    }
-    if (widget.noteInEditing.id != -1) {
-      actions.add(
+      actions.add(Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        child: InkWell(
+          child: GestureDetector(
+            onTap: () => _removeFromTrash(),
+            child: Icon(
+              Icons.restore_from_trash,
+              color: CentralStation.fontColor,
+            ),
+          ),
+        ),
+      ));
+    } else {
+      if (widget.noteInEditing.id != -1) {
+        actions.add(Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: InkWell(
+            child: GestureDetector(
+              onTap: () => _undo(),
+              child: Icon(
+                Icons.undo,
+                color: CentralStation.fontColor,
+              ),
+            ),
+          ),
+        ));
+      }
+      if (widget.noteInEditing.id != -1) {
+        actions.add(
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: InkWell(
+              child: GestureDetector(
+                onTap: () => _archivePopup(context),
+                child: Icon(
+                  Icons.archive,
+                  color: CentralStation.fontColor,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      actions += [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: InkWell(
             child: GestureDetector(
-              onTap: () => _archivePopup(context),
+              onTap: () => bottomSheet(context),
+              // onTap: () => _showWarningDailog(context),
               child: Icon(
-                Icons.archive,
+                Icons.more_vert,
                 color: CentralStation.fontColor,
               ),
             ),
           ),
         ),
-      );
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: InkWell(
+            child: GestureDetector(
+              onTap: () => {_saveAndStartNewNote(context)},
+              child: Icon(
+                Icons.add,
+                color: CentralStation.fontColor,
+              ),
+            ),
+          ),
+        )
+      ];
     }
-    actions += [
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: InkWell(
-          child: GestureDetector(
-            onTap: () => bottomSheet(context),
-            // onTap: () => _showWarningDailog(context),
-            child: Icon(
-              Icons.more_vert,
-              color: CentralStation.fontColor,
-            ),
-          ),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: InkWell(
-          child: GestureDetector(
-            onTap: () => {_saveAndStartNewNote(context)},
-            child: Icon(
-              Icons.add,
-              color: CentralStation.fontColor,
-            ),
-          ),
-        ),
-      )
-    ];
+
     return actions;
+  }
+
+  void _removeFromTrash() {
+    _editableNote.is_deleted = 0;
+    _persistenceTimer.cancel();
+    //show saved toast after calling _persistData function.
+
+    _persistData();
+    //print("salllllllllllllllllllllllllllll");
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => TrashPage()));
   }
 
   void bottomSheet(BuildContext context) {
@@ -248,7 +290,9 @@ class _NotePageState extends State<NotePage> {
   }
 
   void _persistData() {
-    updateNoteObject();
+    if (_isDeleted == 0) {
+      updateNoteObject();
+    }
 
     if (_editableNote.content.isNotEmpty) {
       var noteDB = NotesDBHandler();
@@ -273,6 +317,7 @@ class _NotePageState extends State<NotePage> {
     _editableNote.title = _titleController.text;
     _editableNote.note_color = note_color;
     _editableNote.is_archived = _isArchive;
+
     // _editableNote.
     print("new content: ${_editableNote.content}");
     print(widget.noteInEditing);
@@ -320,33 +365,69 @@ class _NotePageState extends State<NotePage> {
 
   void _deleteNote(BuildContext context) {
     if (_editableNote.id != -1) {
-      //_showWarningDailog(_globalKey.currentContext);
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Confirm ?"),
-              content: Text("This note will be deleted permanently"),
-              actions: <Widget>[
-                FlatButton(
-                    onPressed: () {
-                      _persistenceTimer.cancel();
-                      var noteDB = NotesDBHandler();
-                      Navigator.of(context).pop();
-                      noteDB.deleteNote(_editableNote);
-                      CentralStation.updateNeeded = true;
+      if (_isDeleted == 0) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Confirm ?"),
+                content: Text("This note will be moved to trash"),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        _persistenceTimer.cancel();
+                        var noteDB = NotesDBHandler();
+                        Navigator.of(context).pop();
+                        noteDB.deleteNote(_editableNote);
+                        CentralStation.updateNeeded = true;
 
-                      Navigator.of(context).pop();
-                      showToast("Deleted !",
-                          gravity: Toast.BOTTOM, duration: 2);
-                    },
-                    child: Text("Yes")),
-                FlatButton(
-                    onPressed: () => {Navigator.of(context).pop()},
-                    child: Text("No"))
-              ],
-            );
-          });
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DrawerPage()));
+                        showToast("Moved to trash !",
+                            gravity: Toast.BOTTOM, duration: 2);
+                      },
+                      child: Text("Yes")),
+                  FlatButton(
+                      onPressed: () => {Navigator.of(context).pop()},
+                      child: Text("No"))
+                ],
+              );
+            });
+      } else if (_isDeleted == 1) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Confirm ?"),
+                content: Text("This note will be deleted permanently"),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        _persistenceTimer.cancel();
+                        var noteDB = NotesDBHandler();
+                        Navigator.of(context).pop();
+                        noteDB.deleteNote(_editableNote);
+                        CentralStation.updateNeeded = true;
+
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TrashPage()));
+                        showToast("Deleted !",
+                            gravity: Toast.BOTTOM, duration: 2);
+                      },
+                      child: Text("Yes")),
+                  FlatButton(
+                      onPressed: () => {Navigator.of(context).pop()},
+                      child: Text("No"))
+                ],
+              );
+            });
+      }
+      //_showWarningDailog(_globalKey.currentContext);
+
     }
   }
 
@@ -371,8 +452,8 @@ class _NotePageState extends State<NotePage> {
   void _saveAndStartNewNote(BuildContext context) {
     _persistenceTimer.cancel();
     _persistData();
-    var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0);
+    var emptyNote = new Note(
+        -1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0, 0);
     Navigator.of(context).pop();
     Navigator.push(
         context, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
@@ -384,8 +465,14 @@ class _NotePageState extends State<NotePage> {
 
     _persistData();
     //print("salllllllllllllllllllllllllllll");
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => DrawerPage()));
+    if (_isDeleted == 0) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => DrawerPage()));
+    } else if (_isDeleted == 1) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => TrashPage()));
+    }
+
     //return true;
   }
 
@@ -445,14 +532,17 @@ class _NotePageState extends State<NotePage> {
     } else if (_isArchive == 1) {
       _editableNote.is_archived = 0;
     }
-    
+
     var noteDB = NotesDBHandler();
     noteDB.archiveNote(_editableNote);
     // update will be required to remove the archived note from the staggered view
     CentralStation.updateNeeded = true;
     _persistenceTimer.cancel(); // shutdown the timer
 
-    Navigator.of(context).pop(); // pop back to staggered view
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DrawerPage())); // pop back to staggered view
     // TODO: OPTIONAL show the toast of deletion completion
     // Scaffold.of(context).showSnackBar(new SnackBar(content: Text("deleted")));
     showToast("Archived !", gravity: Toast.BOTTOM, duration: 2);

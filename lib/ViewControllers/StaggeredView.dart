@@ -5,14 +5,20 @@ import '../Models/Note.dart';
 import '../Models/SqliteHandler.dart';
 import '../Models/Utility.dart';
 import '../Views/StaggeredTiles.dart';
-import 'HomePage.dart';
+// import 'HomePage.dart';
+
 
 class StaggeredGridPage extends StatefulWidget {
   final searchview;
-  final notesViewType;
+  final int notesViewType;
   final bool isArchive;
+  final bool isTrash;
   const StaggeredGridPage(
-      {Key key, this.notesViewType, this.searchview, this.isArchive})
+      {Key key,
+      this.notesViewType,
+      this.searchview,
+      this.isArchive,
+      this.isTrash})
       : super(key: key);
   @override
   _StaggeredGridPageState createState() => _StaggeredGridPageState();
@@ -21,7 +27,7 @@ class StaggeredGridPage extends StatefulWidget {
 class _StaggeredGridPageState extends State<StaggeredGridPage> {
   var noteDB = NotesDBHandler();
   List<Map<String, dynamic>> _allNotesInQueryResult = [];
-  viewType notesViewType;
+  int notesViewType;
 
   @override
   void initState() {
@@ -38,20 +44,26 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
   @override
   Widget build(BuildContext context) {
     GlobalKey _stagKey = GlobalKey();
-
+    // if (widget.notesViewType == null) {
+      // this.notesViewType == viewType.Staggered;
+    // }
     print("update needed?: ${CentralStation.updateNeeded}");
     if (CentralStation.updateNeeded) {
-      if (widget.isArchive == null || widget.isArchive == false) {
-        if (widget.searchview == null) {
-          retrieveAllNotesFromDatabase(null);
-        } else {
-          retrieveAllNotesFromDatabase(widget.searchview);
-        }
-      } else if (widget.isArchive != null || widget.isArchive == true) {
-        if (widget.searchview == null) {
-          retrieveAllArchiveFromDatabase(null);
-        } else {
-          retrieveAllArchiveFromDatabase(widget.searchview);
+      if (widget.isTrash != null || widget.isTrash == true) {
+        retrieveAllDeletedNotesFromDatabase();
+      } else {
+        if (widget.isArchive == null || widget.isArchive == false) {
+          if (widget.searchview == null) {
+            retrieveAllNotesFromDatabase(null);
+          } else {
+            retrieveAllNotesFromDatabase(widget.searchview);
+          }
+        } else if (widget.isArchive != null || widget.isArchive == true) {
+          if (widget.searchview == null) {
+            retrieveAllArchiveFromDatabase(null);
+          } else {
+            retrieveAllArchiveFromDatabase(widget.searchview);
+          }
         }
       }
     }
@@ -73,7 +85,7 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
   }
 
   int _colForStaggeredView(BuildContext context) {
-    if (widget.notesViewType == viewType.List) return 1;
+    if (widget.notesViewType == 1) return 1;
     // for width larger than 600 on grid mode, return 3 irrelevant of the orientation to accommodate more notes horizontally
     return MediaQuery.of(context).size.width > 600 ? 3 : 2;
   }
@@ -112,8 +124,8 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
         DateTime.fromMillisecondsSinceEpoch(
             _allNotesInQueryResult[i]["date_last_edited"] * 1000),
         Color(_allNotesInQueryResult[i]["note_color"]),
-        _allNotesInQueryResult[i]['is_archived']
-        ));
+        _allNotesInQueryResult[i]['is_archived'],
+        _allNotesInQueryResult[i]['is_deleted']));
   }
 
   void retrieveAllNotesFromDatabase(String searchview) {
@@ -121,8 +133,9 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
     if (searchview == null) {
       var _testData = noteDB.selectAllNotes();
       _testData.then((value) {
+        this._allNotesInQueryResult = value;
         setState(() {
-          this._allNotesInQueryResult = value;
+          clearWhatShow();
           CentralStation.updateNeeded = false;
         });
       });
@@ -131,10 +144,27 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
 
       _allNotes.then((value) {
         this._allNotesInQueryResult = value;
+        clearWhatShow();
       });
 
       _searchresult(searchview);
     }
+
+    // var _testData =
+    //     (widget.searchQuery == null) ? noteDB.selectAllNotes() : noteDB.selectSearchNotes(widget.searchQuery);
+  }
+
+  void retrieveAllDeletedNotesFromDatabase() {
+    // queries for all the notes from the database ordered by latest edited note. excludes archived notes.
+
+    var _testData = noteDB.selectAllDeletedNotes();
+    _testData.then((value) {
+      setState(() {
+        this._allNotesInQueryResult = value;
+
+        CentralStation.updateNeeded = false;
+      });
+    });
 
     // var _testData =
     //     (widget.searchQuery == null) ? noteDB.selectAllNotes() : noteDB.selectSearchNotes(widget.searchQuery);
@@ -162,13 +192,41 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
     });
   }
 
+  void clearWhatShow() {
+    this._allNotesInQueryResult =
+        this._allNotesInQueryResult.where((Map<String, dynamic> note) {
+      int _is_deleted = note['is_deleted'];
+
+      if (_is_deleted == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }).toList();
+  }
+
+  // void clearWhatShowDeleted() {
+  //   this._allNotesInQueryResult =
+  //       this._allNotesInQueryResult.where((Map<String, dynamic> note) {
+  //     int _is_deleted = note['is_deleted'];
+  //     //String _content = utf8.decode(note['content']);
+
+  //     if (_is_deleted == 1) {
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   }).toList();
+  // }
+
   void retrieveAllArchiveFromDatabase(String searchview) {
     // queries for all the notes from the database ordered by latest edited note. excludes archived notes.
     if (searchview == null) {
       var _testData = noteDB.selectAllArchive();
       _testData.then((value) {
+        this._allNotesInQueryResult = value;
         setState(() {
-          this._allNotesInQueryResult = value;
+          clearWhatShow();
           CentralStation.updateNeeded = false;
         });
       });
@@ -177,6 +235,9 @@ class _StaggeredGridPageState extends State<StaggeredGridPage> {
 
       _allNotes.then((value) {
         this._allNotesInQueryResult = value;
+        setState(() {
+          clearWhatShow();
+        });
       });
 
       _searchArchiveResult(searchview);
