@@ -3,8 +3,7 @@ import './StaggeredView.dart';
 import '../Models/Utility.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './drower_page.dart';
-
-
+import 'dart:io';
 
 class TrashPage extends StatefulWidget {
   @override
@@ -66,7 +65,12 @@ class TrashPageState extends State<TrashPage> {
             bottom: true,
           ),
         ),
-        onWillPop: () async => Future.value(false));
+        onWillPop: () async {
+          Future.value(false);
+          _backToHome();
+          // Navigator.of(context).pop(true);
+          //exit(0);
+        });
     ;
   }
 

@@ -11,6 +11,7 @@ import '../utils/class_builder.dart';
 import './HomePage.dart';
 import '../Models/PlaceHolder.dart';
 import 'NotePage.dart';
+import './SettingsPage.dart';
 
 class DrawerPage extends StatefulWidget {
   DrawerPage({Key key, this.title}) : super(key: key);
@@ -56,6 +57,10 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
           ),
           icon: Icon(Icons.settings, color: Colors.black),
           page: ClassBuilder.fromString('SettingsPage'),
+          onPressed: (){
+            Navigator.push(
+        PlaceHolder.homePageContext, MaterialPageRoute(builder: (ctx) => SettingsOnePage()));
+          },
         ),
       ],
     );

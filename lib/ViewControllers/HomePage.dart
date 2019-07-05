@@ -10,6 +10,7 @@ import '../Models/FabBottomAppBar.dart';
 
 
 
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -171,6 +172,7 @@ class _HomePageState extends State<HomePage> {
         new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0,0);
     Navigator.push(
         ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
+    
   }
 
   void _toggleViewType() {

@@ -35,6 +35,11 @@ dependencies:
   flutter_icons: ^0.1.4
   line_awesome_icons: ^1.0.4+1
   toast: ^0.1.4
+  font_awesome_flutter:
+  rxdart: ^0.21.0
+  flutter_masked_text: ^0.8.0
+  beauty_textfield: ^0.0.1
+  direct_select_flutter: ^1.0.3
 
 dev_dependencies:
   flutter_test:
