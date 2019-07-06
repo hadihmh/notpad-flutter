@@ -8,6 +8,7 @@ import 'NotePage.dart';
 import '../Models/Utility.dart';
 import '../Models/FabBottomAppBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:popup_menu/popup_menu.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,14 +16,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static List<String> _def = [
-    "FF9E9E9E",
-    "FFEEEEEE",
-    "FF9E9E9E",
-    "FF424242",
-    "FFFFFFFF"
-  ];
-
   SharedPreferences pref;
   TextEditingController searchviewlis = new TextEditingController();
   _HomePageState() {
@@ -31,7 +24,6 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           CentralStation.updateNeeded = true;
           searchval = null;
-          //HomePage("ok");
         });
       } else {
         setState(() {
@@ -39,7 +31,6 @@ class _HomePageState extends State<HomePage> {
 
           CentralStation.updateNeeded = true;
           searchval = ser;
-          //HomePage("ok");
         });
       }
     });
@@ -48,96 +39,75 @@ class _HomePageState extends State<HomePage> {
   var notesViewType;
   String searchval;
   bool isArchive;
-  String _lastSelected = 'TAB: 0';
-  // @override
-  // void setState(fn) {
-  //   // TODO: implement setState
-  //   super.setState(fn);
-  //   setState(() {
-  //     theme = PlaceHolder.theme ?? PlaceHolder.theme1;
-  //   });
-  // }
 
   @override
   void initState() {
     CentralStation.updateNeeded = true;
     notesViewType = 0;
     theme = PlaceHolder.theme ?? PlaceHolder.theme1;
-    onchange().then((_){setState(() {
-      theme = PlaceHolder.theme ?? PlaceHolder.theme1;
-    });});
-      
-    
-
-    // theme = PlaceHolder.theme ?? _def;
-    // PlaceHolder.theme = _def;
+    onchange().then((_) {
+      setState(() {
+        theme = PlaceHolder.theme ?? PlaceHolder.theme1;
+      });
+    });
   }
 
   onchange() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-   String fontsize = pref.getString("fontsize");
+    String fontsize = pref.getString("fontsize");
     String theme = pref.getString("theme");
+    
     if (fontsize == null) {
-       pref.setString("fontsize", "f2");
+      pref.setString("fontsize", "f2");
       PlaceHolder.fontsize = PlaceHolder.fontsize2;
-      PlaceHolder.fs=1;
+      PlaceHolder.fs = 1;
     }
     if (theme == null) {
       pref.setString("theme", "t2");
       PlaceHolder.theme = PlaceHolder.theme2;
-      PlaceHolder.ts=1;
+      PlaceHolder.ts = 1;
     }
     if (fontsize != null && theme != null) {
       setState(() {
         String ttype = pref.getString("theme");
-       String ftype = pref.getString("fontsize");
+        String ftype = pref.getString("fontsize");
 
         if (ttype == "t1") {
           PlaceHolder.theme = PlaceHolder.theme1;
-          PlaceHolder.ts=0;
+          PlaceHolder.ts = 0;
         } else if (ttype == "t2") {
           PlaceHolder.theme = PlaceHolder.theme2;
-          PlaceHolder.ts=1;
+          PlaceHolder.ts = 1;
         } else if (ttype == "t3") {
           PlaceHolder.theme = PlaceHolder.theme3;
-          PlaceHolder.ts=2;
+          PlaceHolder.ts = 2;
         } else if (ttype == "t4") {
           PlaceHolder.theme = PlaceHolder.theme4;
-          PlaceHolder.ts=3;
+          PlaceHolder.ts = 3;
         }
         if (ftype == "f1") {
           PlaceHolder.fontsize = PlaceHolder.fontsize1;
-          PlaceHolder.fs=0;
+          PlaceHolder.fs = 0;
         } else if (ftype == "f2") {
           PlaceHolder.fontsize = PlaceHolder.fontsize2;
-          PlaceHolder.fs=1;
+          PlaceHolder.fs = 1;
         } else if (ftype == "f3") {
           PlaceHolder.fontsize = PlaceHolder.fontsize3;
-          PlaceHolder.fs=2;
+          PlaceHolder.fs = 2;
         }
       });
-
-      String df = " ";
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    PlaceHolder.sstate=_homeSState;
+    PopupMenu.context = context;
     PlaceHolder.homePageContext = context;
     return WillPopScope(
         child: Scaffold(
           backgroundColor: Color(PlaceHolder.hexToInt(theme[1])),
           resizeToAvoidBottomPadding: false,
-          // appBar: AppBar(
-          //   brightness: Brightness.light,
-          //   //actions: _appBarActions(),
-          //   // actions: <Widget>[RaisedButton(onPressed: (){onpresswid();},child: Icon(Icons.add),)],
-
-          //   elevation: 1,
-          //   backgroundColor: Colors.white,
-          //   centerTitle: true,
-          //   title: Text("Notes"),
-          // ),
           appBar: AppBar(
             automaticallyImplyLeading: false,
             backgroundColor: Color(PlaceHolder.hexToInt(theme[0])),
@@ -151,26 +121,24 @@ class _HomePageState extends State<HomePage> {
             top: true,
             bottom: true,
           ),
-          //bottomSheet: _bottomBar(),
-          //floatingActionButtonLocation: FloatingActionButtonLocation.endTop
           bottomNavigationBar: _bulidBottomNavBar(),
-
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
-          //floatingActionButton: _buildFab(context),
           floatingActionButton: FloatingActionButton(
             child: Icon(Icons.create),
             backgroundColor: Color(PlaceHolder.hexToInt(theme[10])),
             onPressed: () {
               _newNoteTapped(context);
-
-              //print(pref.getString("test")) ;
             },
           ),
         ),
         onWillPop: () async => Future.value(false));
   }
-
+void _homeSState(){
+  setState(() {
+   int a=0; 
+  });
+}
   Widget _body() {
     print(notesViewType);
     return Container(
@@ -181,37 +149,8 @@ class _HomePageState extends State<HomePage> {
     ));
   }
 
-  // Widget _bottomBar() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.end,
-  //     children: <Widget>[
-  //       Padding(
-  //         padding: EdgeInsets.all(30),
-  //         child: FloatingActionButton(
-  //           onPressed: () {
-  //             _newNoteTapped(context);
-  //           },
-  //           child: Icon(Icons.add),
-  //           backgroundColor: Colors.grey,
-  //         ),
-  //       ),
-
-  //       //FlatButton(
-
-  //       // child: Text(
-  //       //   "New Note\n",
-  //       //   style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-  //       // ),
-  //       //onPressed: () => _newNoteTapped(context),
-  //       // )
-  //     ],
-  //   );
-  // }
-
   void _selectedFab(int index) {
     setState(() {
-      _lastSelected = 'FAB: $index';
-      print("---------------------------------$index");
       CentralStation.updateNeeded = true;
       if (index == 1) {
         PlaceHolder.isArch = false;
@@ -261,23 +200,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  List<Widget> _appBarActions() {
-    return [
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: InkWell(
-          child: GestureDetector(
-            onTap: () => _toggleViewType(),
-            child: Icon(
-              notesViewType == 1 ? Icons.developer_board : Icons.view_headline,
-              color: CentralStation.fontColor,
-            ),
-          ),
-        ),
-      ),
-    ];
-  }
-
   Widget searchCard() => Padding(
         padding: const EdgeInsets.all(1.0),
         child: Card(
@@ -296,31 +218,15 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(MdiIcons.menuOpen),
                   iconSize: 25,
                   onPressed: () {
-                    //widget.onMenuPressed();
-                    //SearchArg.onpress=widget.onMenuPressed;
                     PlaceHolder.onpress();
                   },
                 ),
-                // InkWell(
-                //   onTap: _neverSatisfied,
-                //   child: Icon(
-                //     Icons.search,
-                //     color: Colors.black,
-                //   ),
-                // ),
                 SizedBox(
                   width: 5.0,
                 ),
                 Expanded(
                   child: TextField(
                     controller: searchviewlis,
-                    // onChanged: (text) {
-                    //   StaggeredGridPage(
-                    //     notesViewType: viewType.Staggered,
-                    //     searchview: searchview,
-                    //   );
-                    // print('dddddddddssfa322');
-                    // },
                     decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: "Search your notes..."),
@@ -337,9 +243,6 @@ class _HomePageState extends State<HomePage> {
                   iconSize: 25,
                   onPressed: () {
                     _toggleViewType();
-                    //widget.onMenuPressed();
-                    //SearchArg.onpress=widget.onMenuPressed;
-                    //SearchArg.onpress();
                   },
                 ),
               ],
@@ -347,33 +250,4 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       );
-
-// #region AlertBox
-  // Future<void> _neverSatisfied() async {
-  //   return showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false, // user must tap button!
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Rewind and remember'),
-  //         content: SingleChildScrollView(
-  //           child: ListBody(
-  //             children: <Widget>[
-  //               Text('You will never be satisfied.'),
-  //               Text('You\’re like me. I’m never satisfied.'),
-  //             ],
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           FlatButton(
-  //             child: Text('Regret'),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 }

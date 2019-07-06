@@ -14,6 +14,7 @@ class TrashPage extends StatefulWidget {
 }
 
 class TrashPageState extends State<TrashPage> {
+  
   List<String> theme=PlaceHolder.theme;
   var notesViewType;
 
@@ -25,6 +26,7 @@ class TrashPageState extends State<TrashPage> {
 
   @override
   Widget build(BuildContext context) {
+    PlaceHolder.tstate=_trashSState;
     return WillPopScope(
         child: Scaffold(
           resizeToAvoidBottomPadding: false,
@@ -90,7 +92,11 @@ class TrashPageState extends State<TrashPage> {
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => DrawerPage()));
   }
-
+void _trashSState(){
+  setState(() {
+   int a=0; 
+  });
+}
   void _toggleViewType() {
     setState(() {
       CentralStation.updateNeeded = true;

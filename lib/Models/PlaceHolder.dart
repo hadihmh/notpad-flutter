@@ -16,6 +16,9 @@ class PlaceHolder {
   static double fontsize1=13;
   static double fontsize2=23;
   static double fontsize3=30;
+  static bool isPopUp=false;
+  static Function sstate;
+  static Function tstate;
 
 
 

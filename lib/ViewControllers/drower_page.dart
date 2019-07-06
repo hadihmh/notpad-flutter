@@ -13,6 +13,7 @@ import '../Models/PlaceHolder.dart';
 import 'NotePage.dart';
 import './SettingsPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../screens/AboutUs.dart';
 
 class DrawerPage extends StatefulWidget {
   DrawerPage({Key key, this.title}) : super(key: key);
@@ -173,12 +174,8 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
             color: Color(PlaceHolder.hexToInt(theme[1])),
           ),
           onPressed: () {
-            Navigator.of(context).push(CupertinoPageRoute(
-              fullscreenDialog: true,
-              builder: (BuildContext context) {
-                return AuthPage();
-              },
-            ));
+           Navigator.push(PlaceHolder.homePageContext,
+                MaterialPageRoute(builder: (ctx) => AboutUs()));
           },
         ),
         decoration: BoxDecoration(

@@ -68,7 +68,8 @@ class _NotePageState extends State<NotePage> {
       _persistData();
     });
   }
-List<String> theme=PlaceHolder.theme;
+
+  List<String> theme = PlaceHolder.theme;
   @override
   Widget build(BuildContext context) {
     //contextForSnak=context;
@@ -121,7 +122,10 @@ List<String> theme=PlaceHolder.theme;
 //          decoration: BoxDecoration(border: Border.all(color: CentralStation.borderColor,width: 1 ),borderRadius: BorderRadius.all(Radius.circular(10)) ),
                 child: TextFormField(
                   decoration: InputDecoration(
-                      border: InputBorder.none, hintText: "Title",hintStyle: TextStyle(color: Color(PlaceHolder.hexToInt(theme[10])))),
+                      border: InputBorder.none,
+                      hintText: "Title",
+                      hintStyle: TextStyle(
+                          color: Color(PlaceHolder.hexToInt(theme[10])))),
                   onSaved: (str) => {updateNoteObject()},
                   maxLines: null,
                   controller: _titleController,
@@ -173,7 +177,10 @@ List<String> theme=PlaceHolder.theme;
   }
 
   Widget _pageTitle() {
-    return Text(_editableNote.id == -1 ? "New Note" : "Edit Note",style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),);
+    return Text(
+      _editableNote.id == -1 ? "New Note" : "Edit Note",
+      style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),
+    );
   }
 
   List<Widget> _archiveAction(BuildContext context) {
@@ -225,10 +232,15 @@ List<String> theme=PlaceHolder.theme;
             child: InkWell(
               child: GestureDetector(
                 onTap: () => _archivePopup(context),
-                child: Icon(
-                  Icons.archive,
-                  color: Color(PlaceHolder.hexToInt(theme[1])),
-                ),
+                child: _isArchive == 0
+                    ? Icon(
+                        Icons.archive,
+                        color: Color(PlaceHolder.hexToInt(theme[1])),
+                      )
+                    : Icon(
+                        Icons.unarchive,
+                        color: Color(PlaceHolder.hexToInt(theme[1])),
+                      ),
               ),
             ),
           ),
@@ -429,9 +441,8 @@ List<String> theme=PlaceHolder.theme;
       }
       //_showWarningDailog(_globalKey.currentContext);
 
-    }else{
-      showToast("You cant delete!",
-                            gravity: Toast.BOTTOM, duration: 2);
+    } else {
+      showToast("You cant delete!", gravity: Toast.BOTTOM, duration: 2);
     }
   }
 
@@ -470,6 +481,7 @@ List<String> theme=PlaceHolder.theme;
     _persistData();
     //print("salllllllllllllllllllllllllllll");
     if (_isDeleted == 0) {
+      PlaceHolder.isArch = false;
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => DrawerPage()));
     } else if (_isDeleted == 1) {
@@ -526,7 +538,7 @@ List<String> theme=PlaceHolder.theme;
     _persistenceTimer.cancel();
     CentralStation.updateNeeded = false;
     Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => DrawerPage()));
+        context, MaterialPageRoute(builder: (context) => DrawerPage()));
   }
 
   void _archiveThisNote(BuildContext context) {
@@ -558,26 +570,15 @@ List<String> theme=PlaceHolder.theme;
   }
 
   void _copy() {
-    if (_editableNote.content!="" ) {
+    if (_editableNote.content != "") {
       Clipboard.setData(new ClipboardData(text: _editableNote.content));
-      //Navigator.of(_globalKey.currentContext).pop();
-      //_displaySnackBar('Note Copied To Clipboard ! ');
-      showToast("Note Copied To Clipboard !", gravity: Toast.BOTTOM, duration: 2);
-    }else{
-     // _displaySnackBar('There is nothing to copy ! ');
-      showToast("There is nothing to copy !", gravity: Toast.BOTTOM, duration: 2);
-    }
-    // var noteDB = NotesDBHandler();
-    // Note copy = Note(-1, _editableNote.title, _editableNote.content,
-    //     DateTime.now(), DateTime.now(), _editableNote.note_color);
 
-    // var status = noteDB.copyNote(copy);
-    // status.then((query_success) {
-    //   if (query_success) {
-    //     CentralStation.updateNeeded = true;
-    //     Navigator.of(_globalKey.currentContext).pop();
-    //   }
-    // });
+      showToast("Note Copied To Clipboard !",
+          gravity: Toast.BOTTOM, duration: 2);
+    } else {
+      showToast("There is nothing to copy !",
+          gravity: Toast.BOTTOM, duration: 2);
+    }
   }
 
   _displaySnackBar(String showtext) {
