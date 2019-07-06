@@ -40,6 +40,7 @@ dependencies:
   flutter_masked_text: ^0.8.0
   beauty_textfield: ^0.0.1
   direct_select_flutter: ^1.0.3
+  shared_preferences: ^0.5.3+1
 
 dev_dependencies:
   flutter_test:
@@ -73,7 +74,9 @@ flutter:
      - Assets/Fonts/Roboto-Regular.ttf
      - Assets/back.jpg
      - Assets/logo.jpg
-     - Assets/logo2.png
+     - Assets/logo-grey.png
+     - Assets/logo-green.png
+     - Assets/logo-blue.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

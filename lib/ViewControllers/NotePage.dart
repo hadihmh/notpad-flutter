@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
 
 import 'drower_page.dart';
+import '../Models/PlaceHolder.dart';
 
 class NotePage extends StatefulWidget {
   final Note noteInEditing;
@@ -67,7 +68,7 @@ class _NotePageState extends State<NotePage> {
       _persistData();
     });
   }
-
+List<String> theme=PlaceHolder.theme;
   @override
   Widget build(BuildContext context) {
     //contextForSnak=context;
@@ -90,12 +91,12 @@ class _NotePageState extends State<NotePage> {
               onPressed: _readyToPop,
               icon: Icon(
                 MdiIcons.backburger,
-                color: Colors.black,
+                color: Color(PlaceHolder.hexToInt(theme[1])),
               ),
             ),
             actions: _archiveAction(context),
             elevation: 1,
-            backgroundColor: note_color,
+            backgroundColor: Color(PlaceHolder.hexToInt(theme[0])),
             title: _pageTitle(),
           ),
           body: _body(context, deviceHeight, deviceWidth),
@@ -120,13 +121,13 @@ class _NotePageState extends State<NotePage> {
 //          decoration: BoxDecoration(border: Border.all(color: CentralStation.borderColor,width: 1 ),borderRadius: BorderRadius.all(Radius.circular(10)) ),
                 child: TextFormField(
                   decoration: InputDecoration(
-                      border: InputBorder.none, hintText: "Title"),
+                      border: InputBorder.none, hintText: "Title",hintStyle: TextStyle(color: Color(PlaceHolder.hexToInt(theme[10])))),
                   onSaved: (str) => {updateNoteObject()},
                   maxLines: null,
                   controller: _titleController,
                   focusNode: _titleFocus,
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Color(PlaceHolder.hexToInt(theme[10])),
                       fontSize: 22,
                       fontWeight: FontWeight.bold),
                   cursorColor: Colors.blue,
@@ -156,7 +157,7 @@ class _NotePageState extends State<NotePage> {
                     focusNode: _contentFocus,
 
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Color(PlaceHolder.hexToInt(theme[10])),
                       fontSize: 20,
                     ),
                     //backgroundCursorColor: Colors.red,
@@ -172,7 +173,7 @@ class _NotePageState extends State<NotePage> {
   }
 
   Widget _pageTitle() {
-    return Text(_editableNote.id == -1 ? "New Note" : "Edit Note");
+    return Text(_editableNote.id == -1 ? "New Note" : "Edit Note",style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),);
   }
 
   List<Widget> _archiveAction(BuildContext context) {
@@ -185,7 +186,7 @@ class _NotePageState extends State<NotePage> {
             onTap: () => _deleteNote(context),
             child: Icon(
               Icons.delete_forever,
-              color: CentralStation.fontColor,
+              color: Color(PlaceHolder.hexToInt(theme[1])),
             ),
           ),
         ),
@@ -197,7 +198,7 @@ class _NotePageState extends State<NotePage> {
             onTap: () => _removeFromTrash(),
             child: Icon(
               Icons.restore_from_trash,
-              color: CentralStation.fontColor,
+              color: Color(PlaceHolder.hexToInt(theme[1])),
             ),
           ),
         ),
@@ -211,7 +212,7 @@ class _NotePageState extends State<NotePage> {
               onTap: () => _undo(),
               child: Icon(
                 Icons.undo,
-                color: CentralStation.fontColor,
+                color: Color(PlaceHolder.hexToInt(theme[1])),
               ),
             ),
           ),
@@ -226,7 +227,7 @@ class _NotePageState extends State<NotePage> {
                 onTap: () => _archivePopup(context),
                 child: Icon(
                   Icons.archive,
-                  color: CentralStation.fontColor,
+                  color: Color(PlaceHolder.hexToInt(theme[1])),
                 ),
               ),
             ),
@@ -242,7 +243,7 @@ class _NotePageState extends State<NotePage> {
               // onTap: () => _showWarningDailog(context),
               child: Icon(
                 Icons.more_vert,
-                color: CentralStation.fontColor,
+                color: Color(PlaceHolder.hexToInt(theme[1])),
               ),
             ),
           ),
@@ -254,7 +255,7 @@ class _NotePageState extends State<NotePage> {
               onTap: () => {_saveAndStartNewNote(context)},
               child: Icon(
                 Icons.add,
-                color: CentralStation.fontColor,
+                color: Color(PlaceHolder.hexToInt(theme[1])),
               ),
             ),
           ),
@@ -428,6 +429,9 @@ class _NotePageState extends State<NotePage> {
       }
       //_showWarningDailog(_globalKey.currentContext);
 
+    }else{
+      showToast("You cant delete!",
+                            gravity: Toast.BOTTOM, duration: 2);
     }
   }
 
@@ -521,7 +525,8 @@ class _NotePageState extends State<NotePage> {
   void _exitWithoutSaving(BuildContext context) {
     _persistenceTimer.cancel();
     CentralStation.updateNeeded = false;
-    Navigator.of(context).pop();
+    Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => DrawerPage()));
   }
 
   void _archiveThisNote(BuildContext context) {
@@ -553,10 +558,14 @@ class _NotePageState extends State<NotePage> {
   }
 
   void _copy() {
-    if (_editableNote.id != -1) {
+    if (_editableNote.content!="" ) {
       Clipboard.setData(new ClipboardData(text: _editableNote.content));
       //Navigator.of(_globalKey.currentContext).pop();
-      _displaySnackBar('Note Copied To Clipboard ! ');
+      //_displaySnackBar('Note Copied To Clipboard ! ');
+      showToast("Note Copied To Clipboard !", gravity: Toast.BOTTOM, duration: 2);
+    }else{
+     // _displaySnackBar('There is nothing to copy ! ');
+      showToast("There is nothing to copy !", gravity: Toast.BOTTOM, duration: 2);
     }
     // var noteDB = NotesDBHandler();
     // Note copy = Note(-1, _editableNote.title, _editableNote.content,

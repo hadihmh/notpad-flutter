@@ -7,9 +7,7 @@ import '../Models/Note.dart';
 import 'NotePage.dart';
 import '../Models/Utility.dart';
 import '../Models/FabBottomAppBar.dart';
-
-
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,6 +15,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static List<String> _def = [
+    "FF9E9E9E",
+    "FFEEEEEE",
+    "FF9E9E9E",
+    "FF424242",
+    "FFFFFFFF"
+  ];
+
+  SharedPreferences pref;
   TextEditingController searchviewlis = new TextEditingController();
   _HomePageState() {
     searchviewlis.addListener(() {
@@ -37,15 +44,65 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
-
+  List<String> theme;
   var notesViewType;
   String searchval;
   bool isArchive;
   String _lastSelected = 'TAB: 0';
+  // @override
+  // void setState(fn) {
+  //   // TODO: implement setState
+  //   super.setState(fn);
+  //   setState(() {
+  //     theme = PlaceHolder.theme ?? PlaceHolder.theme1;
+  //   });
+  // }
+
   @override
   void initState() {
     CentralStation.updateNeeded = true;
     notesViewType = 0;
+    theme = PlaceHolder.theme ?? PlaceHolder.theme1;
+    onchange().then((_){setState(() {
+      theme = PlaceHolder.theme ?? PlaceHolder.theme1;
+    });});
+      
+    
+
+    // theme = PlaceHolder.theme ?? _def;
+    // PlaceHolder.theme = _def;
+  }
+
+  onchange() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    double fontsize = pref.getDouble("fontsize");
+    String theme = pref.getString("theme");
+    if (fontsize == null) {
+      pref.setDouble("fontsize", 13.0);
+      PlaceHolder.fontsize = 13.0;
+    }
+    if (theme == null) {
+      pref.setString("theme", "t1");
+      PlaceHolder.theme = PlaceHolder.theme1;
+    }
+    if (fontsize != null && theme != null) {
+      setState(() {
+        String ttype = pref.getString("theme");
+        PlaceHolder.fontsize = pref.getDouble("fontsize");
+        //PlaceHolder.theme = PlaceHolder.theme4;
+        if (ttype == "t1") {
+          PlaceHolder.theme = PlaceHolder.theme1;
+        } else if (ttype == "t2") {
+          PlaceHolder.theme = PlaceHolder.theme2;
+        } else if (ttype == "t3") {
+          PlaceHolder.theme = PlaceHolder.theme3;
+        } else if (ttype == "t4") {
+          PlaceHolder.theme = PlaceHolder.theme4;
+        }
+      });
+
+      String df = " ";
+    }
   }
 
   @override
@@ -53,6 +110,7 @@ class _HomePageState extends State<HomePage> {
     PlaceHolder.homePageContext = context;
     return WillPopScope(
         child: Scaffold(
+          backgroundColor: Color(PlaceHolder.hexToInt(theme[1])),
           resizeToAvoidBottomPadding: false,
           // appBar: AppBar(
           //   brightness: Brightness.light,
@@ -66,7 +124,7 @@ class _HomePageState extends State<HomePage> {
           // ),
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: Colors.grey,
+            backgroundColor: Color(PlaceHolder.hexToInt(theme[0])),
             centerTitle: true,
             title: searchCard(),
           ),
@@ -86,9 +144,11 @@ class _HomePageState extends State<HomePage> {
           //floatingActionButton: _buildFab(context),
           floatingActionButton: FloatingActionButton(
             child: Icon(Icons.create),
-            backgroundColor: Colors.black,
+            backgroundColor: Color(PlaceHolder.hexToInt(theme[10])),
             onPressed: () {
               _newNoteTapped(context);
+
+              //print(pref.getString("test")) ;
             },
           ),
         ),
@@ -105,32 +165,32 @@ class _HomePageState extends State<HomePage> {
     ));
   }
 
-  Widget _bottomBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.all(30),
-          child: FloatingActionButton(
-            onPressed: () {
-              _newNoteTapped(context);
-            },
-            child: Icon(Icons.add),
-            backgroundColor: Colors.grey,
-          ),
-        ),
+  // Widget _bottomBar() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.end,
+  //     children: <Widget>[
+  //       Padding(
+  //         padding: EdgeInsets.all(30),
+  //         child: FloatingActionButton(
+  //           onPressed: () {
+  //             _newNoteTapped(context);
+  //           },
+  //           child: Icon(Icons.add),
+  //           backgroundColor: Colors.grey,
+  //         ),
+  //       ),
 
-        //FlatButton(
+  //       //FlatButton(
 
-        // child: Text(
-        //   "New Note\n",
-        //   style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-        // ),
-        //onPressed: () => _newNoteTapped(context),
-        // )
-      ],
-    );
-  }
+  //       // child: Text(
+  //       //   "New Note\n",
+  //       //   style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+  //       // ),
+  //       //onPressed: () => _newNoteTapped(context),
+  //       // )
+  //     ],
+  //   );
+  // }
 
   void _selectedFab(int index) {
     setState(() {
@@ -148,13 +208,13 @@ class _HomePageState extends State<HomePage> {
 
   Widget _bulidBottomNavBar() {
     return FABBottomAppBar(
-      height: 40,
+      height: 45,
       iconSize: 19,
-      backgroundColor: Colors.grey,
+      backgroundColor: Color(PlaceHolder.hexToInt(theme[4])),
 
       //centerItemText: 'A',
       color: Colors.white,
-      selectedColor: Colors.black,
+      selectedColor: Color(PlaceHolder.hexToInt(theme[9])),
       notchedShape: CircularNotchedRectangle(),
       onTabSelected: _selectedFab,
       items: [
@@ -168,11 +228,10 @@ class _HomePageState extends State<HomePage> {
 
   void _newNoteTapped(BuildContext ctx) {
     // "-1" id indicates the note is not new
-    var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0,0);
+    var emptyNote = new Note(
+        -1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0, 0);
     Navigator.push(
         ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
-    
   }
 
   void _toggleViewType() {
@@ -194,9 +253,7 @@ class _HomePageState extends State<HomePage> {
           child: GestureDetector(
             onTap: () => _toggleViewType(),
             child: Icon(
-              notesViewType == 1
-                  ? Icons.developer_board
-                  : Icons.view_headline,
+              notesViewType == 1 ? Icons.developer_board : Icons.view_headline,
               color: CentralStation.fontColor,
             ),
           ),

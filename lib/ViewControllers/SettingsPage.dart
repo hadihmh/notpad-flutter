@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './drower_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../Models/PlaceHolder.dart';
 
 class SettingsOnePage extends StatefulWidget {
   @override
@@ -12,18 +14,8 @@ class SettingsOnePage extends StatefulWidget {
 }
 
 class SettingsOnePageState extends State<SettingsOnePage> {
-  int selectedFoodVariants = 0;
-  int selectedPortionCounts = 0;
-  int selectedPortionSize = 0;
   int _themeValue = 0;
   int _fontValue = 0;
-  List<String> _fontSize = [
-    "Chicken grilled",
-    "Pork grilled",
-    "Vegetables as is",
-    "Cheese as is",
-    "Bread tasty"
-  ];
 
   Widget bodyData() => SingleChildScrollView(
         child: Theme(
@@ -38,12 +30,13 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       "Theme Setting",
-                      style: TextStyle(color: Colors.grey.shade700),
+                      style: TextStyle(
+                          color: Color(PlaceHolder.hexToInt(theme[10]))),
                     ),
                   ),
 
                   Card(
-                    color: Colors.white,
+                    color: Color(PlaceHolder.hexToInt(theme[2])),
                     elevation: 5.0,
                     child: Column(
                       children: <Widget>[
@@ -52,11 +45,11 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                         // ),
 
                         Padding(
-                          padding: const EdgeInsets.only(left: 16, top: 10),
+                          padding: const EdgeInsets.only(left: 16, top: 18),
                           child: ListTile(
                             leading: Container(
-                              height: 25,
-                              width: 25,
+                              height: 32,
+                              width: 32,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(25),
                                 gradient: LinearGradient(
@@ -75,7 +68,10 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                             title: Text(
                               "Theme",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color:
+                                      Color(PlaceHolder.hexToInt(theme[10]))),
                             ),
                             trailing: Icon(Icons.arrow_drop_down),
                           ),
@@ -104,8 +100,16 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                 title: Text("Grey"),
                                 trailing: Radio(
                                   groupValue: _themeValue,
-                                  onChanged: (int i) =>
-                                      setState(() => _themeValue = i),
+                                  onChanged: (int i) => setState(() {
+                                        _themeValue = i;
+                                        _bulidTheme().then((_) {
+                                          setState(() {
+                                            PlaceHolder.theme =
+                                                PlaceHolder.theme1;
+                                            theme = PlaceHolder.theme1;
+                                          });
+                                        });
+                                      }),
                                   value: 0,
                                 ),
                               ),
@@ -119,12 +123,20 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(25),
-                                          color: Colors.black)),
-                                  title: Text("Dark Mode"),
+                                          color: Colors.blueGrey)),
+                                  title: Text("Blue Grey"),
                                   trailing: Radio(
                                     groupValue: _themeValue,
-                                    onChanged: (int i) =>
-                                        setState(() => _themeValue = i),
+                                    onChanged: (int i) => setState(() {
+                                          _themeValue = i;
+                                          _bulidTheme().then((_) {
+                                            setState(() {
+                                              PlaceHolder.theme =
+                                                  PlaceHolder.theme2;
+                                              theme = PlaceHolder.theme2;
+                                            });
+                                          });
+                                        }),
                                     value: 1,
                                   ),
                                 )),
@@ -150,14 +162,22 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                 title: Text("Blue"),
                                 trailing: Radio(
                                   groupValue: _themeValue,
-                                  onChanged: (int i) =>
-                                      setState(() => _themeValue = i),
+                                  onChanged: (int i) => setState(() {
+                                        _themeValue = i;
+                                        _bulidTheme().then((_) {
+                                          setState(() {
+                                            PlaceHolder.theme =
+                                                PlaceHolder.theme3;
+                                            theme = PlaceHolder.theme3;
+                                          });
+                                        });
+                                      }),
                                   value: 2,
                                 ),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 30, bottom: 13),
+                              padding: EdgeInsets.only(left: 30, bottom: 18),
                               child: ListTile(
                                 leading: Container(
                                     height: 25,
@@ -178,8 +198,16 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                 title: Text("Green"),
                                 trailing: Radio(
                                   groupValue: _themeValue,
-                                  onChanged: (int i) =>
-                                      setState(() => _themeValue = i),
+                                  onChanged: (int i) => setState(() {
+                                        _themeValue = i;
+                                        _bulidTheme().then((_) {
+                                          setState(() {
+                                            PlaceHolder.theme =
+                                                PlaceHolder.theme4;
+                                            theme = PlaceHolder.theme4;
+                                          });
+                                        });
+                                      }),
                                   value: 3,
                                 ),
                               ),
@@ -195,28 +223,33 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       "Font",
-                      style: TextStyle(color: Colors.grey.shade700),
+                      style: TextStyle(
+                          color: Color(PlaceHolder.hexToInt(theme[10]))),
                     ),
                   ),
                   Card(
-                    color: Colors.white,
-                    elevation: 2.0,
+                    color: Color(PlaceHolder.hexToInt(theme[2])),
+                    elevation: 5.0,
                     child: Column(
                       children: <Widget>[
                         // Container(
                         //   child: _bulidListTiles(),
                         // ),
                         Padding(
-                          padding: EdgeInsets.only(top: 10, left: 10),
+                          padding: EdgeInsets.only(top: 15, left: 10),
                           child: ListTile(
                             leading: Icon(
                               Icons.font_download,
                               size: 32,
+                              color: Color(PlaceHolder.hexToInt(theme[10])),
                             ),
                             title: Text(
                               "Font Size",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color:
+                                      Color(PlaceHolder.hexToInt(theme[10]))),
                             ),
                             trailing: Icon(Icons.arrow_drop_down),
                           ),
@@ -231,6 +264,7 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                 leading: Icon(
                                   Icons.font_download,
                                   size: 25,
+                                  color: Color(PlaceHolder.hexToInt(theme[10])),
                                 ),
                                 title: Text("Small"),
                                 trailing: Radio(
@@ -247,6 +281,8 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                   leading: Icon(
                                     Icons.font_download,
                                     size: 30,
+                                    color:
+                                        Color(PlaceHolder.hexToInt(theme[10])),
                                   ),
                                   title: Text(
                                     "Medium",
@@ -260,11 +296,12 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                   ),
                                 )),
                             Padding(
-                              padding: EdgeInsets.only(left: 23, bottom: 10),
+                              padding: EdgeInsets.only(left: 23, bottom: 15),
                               child: ListTile(
                                 leading: Icon(
                                   Icons.font_download,
                                   size: 35,
+                                  color: Color(PlaceHolder.hexToInt(theme[10])),
                                 ),
                                 title: Text(
                                   "Large",
@@ -287,91 +324,97 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                   ),
                 ],
               ),
-              padding: EdgeInsets.only(right: 2, left: 2, bottom: 13),
+              padding: EdgeInsets.only(right: 2, left: 2, bottom: 18),
             )),
       );
+  List<String> theme;
+  @override
+  void initState() {
+    onchange().then((_) {
+      setState(() {
+        theme = PlaceHolder.theme ?? PlaceHolder.theme1;
+      });
+    });
+
+    // theme = PlaceHolder.theme ?? _def;
+    // PlaceHolder.theme = _def;
+  }
+
+  onchange() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+
+    setState(() {
+      String ttype = pref.getString("theme");
+      PlaceHolder.fontsize = pref.getDouble("fontsize");
+      //PlaceHolder.theme = PlaceHolder.theme4;
+      if (ttype == "t1") {
+        PlaceHolder.theme = PlaceHolder.theme1;
+        _themeValue = 0;
+      } else if (ttype == "t2") {
+        PlaceHolder.theme = PlaceHolder.theme2;
+        _themeValue = 1;
+      } else if (ttype == "t3") {
+        PlaceHolder.theme = PlaceHolder.theme3;
+        _themeValue = 2;
+      } else if (ttype == "t4") {
+        PlaceHolder.theme = PlaceHolder.theme4;
+        _themeValue = 3;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(child:Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-              onPressed: _readyToPop,
-              icon: Icon(
-                MdiIcons.backburger,
-                color: Colors.black,
-              ),
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: _readyToPop,
+            icon: Icon(
+              MdiIcons.backburger,
+              color: Color(PlaceHolder.hexToInt(theme[1])),
             ),
-        title: Text("Device Settings"),
-        backgroundColor: Colors.grey,
-      ),
-      // appTitle: "Device Settings",
-      // showDrawer: false,
-      // showFAB: false,
-      backgroundColor: Colors.grey.shade300,
-      body: bodyData(),
-    ) ,onWillPop:() async => Future.value(false) ,); 
-  }
-void _readyToPop(){
-  Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => DrawerPage()));
-}
-  Widget _bulidListTiles() {
-    return ExpansionTile(
-      title: Column(
-        // mainAxisAlignment: MainAxisAlignment.center,
-        // crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          ListTile(
-            //onTap: (){},
-            // leading: Icon(
-            //   Icons.volume_up,
-            //   //size: 10,
-            //   color: Colors.green,
-            // ),
-            title: Text(
-              _fontSize[selected],
-              textAlign: TextAlign.left,
-            ),
-            //trailing: Icon(Icons.arrow_right),
           ),
-        ],
-      ),
-      children: <Widget>[
-        Column(
-          children: _buildExpandableContent(_fontSize),
+          title: Text(
+            "Device Settings",
+            style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),
+          ),
+          backgroundColor: Color(PlaceHolder.hexToInt(theme[0])),
         ),
-      ],
+        // appTitle: "Device Settings",
+        // showDrawer: false,
+        // showFAB: false,
+        backgroundColor: Color(PlaceHolder.hexToInt(theme[1])),
+        body: bodyData(),
+      ),
+      onWillPop: () async => Future.value(false),
     );
   }
 
-  int selected = 0;
-  List<Widget> _buildExpandableContent(List fs) {
-    List<Widget> columnContent = [];
+  void _readyToPop() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => DrawerPage()));
+  }
 
-    for (int i = 0; i < fs.length; i++) {
-      columnContent.add(
-        ListTile(
-          onTap: () {
-            setState(() {
-              selected = i;
-            });
-          },
-          title: Text(
-            fs[i],
-            style: TextStyle(fontSize: 18.0),
-          ),
-          leading: IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              setState(() {
-                selected = i;
-              });
-            },
-          ),
-        ),
-      );
+  _bulidTheme() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+
+    if (_fontValue == 0) {
+      pref.setDouble("fontsize", 13.0);
+    } else if (_fontValue == 1) {
+      pref.setDouble("fontsize", 23.0);
+    } else if (_fontValue == 2) {
+      pref.setDouble("fontsize", 30.0);
     }
-    return columnContent;
+
+    if (_themeValue == 0) {
+      pref.setString("theme", "t1");
+    } else if (_themeValue == 1) {
+      pref.setString("theme", "t2");
+    } else if (_themeValue == 2) {
+      pref.setString("theme", "t3");
+    } else if (_themeValue == 3) {
+      pref.setString("theme", "t4");
+    }
   }
 }

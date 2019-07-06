@@ -12,6 +12,7 @@ import './HomePage.dart';
 import '../Models/PlaceHolder.dart';
 import 'NotePage.dart';
 import './SettingsPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerPage extends StatefulWidget {
   DrawerPage({Key key, this.title}) : super(key: key);
@@ -23,55 +24,105 @@ class DrawerPage extends StatefulWidget {
 
 class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
   KFDrawerController _drawerController;
-
+  List<String> theme;
+  String logo;
   @override
   void initState() {
     super.initState();
+    theme = PlaceHolder.theme ?? PlaceHolder.theme1;
+    logo=PlaceHolder.logo??PlaceHolder.logoGrey;
+    onchange().then((_) {
+      setState(() {
+        theme = PlaceHolder.theme ?? PlaceHolder.theme1;
+        logo=PlaceHolder.logo??PlaceHolder.logoGrey;
+      });
+    });
+    //onchange();
     _drawerController = KFDrawerController(
       initialPage: ClassBuilder.fromString('MainPage'),
       items: [
         KFDrawerItem.initWithPage(
-          text: Text('New Note', style: TextStyle(color: Colors.white)),
-          icon: Icon(Icons.note, color: Colors.black),
+          text: Text('New Note', style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1])))),
+          icon: Icon(Icons.note, color: Color(PlaceHolder.hexToInt(theme[10]))),
           page: MainPage(),
-          onPressed: (){
-            _newNoteTapped(PlaceHolder.homePageContext);},
+          onPressed: () {
+            _newNoteTapped(PlaceHolder.homePageContext);
+          },
         ),
         KFDrawerItem.initWithPage(
           text: Text(
             'Trash',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),
           ),
-          icon: Icon(Icons.delete, color: Colors.black),
+          icon: Icon(Icons.delete, color: Color(PlaceHolder.hexToInt(theme[10]))),
           page: CalendarPage(),
-          onPressed: (){
-
+          onPressed: () {
             Navigator.pushReplacement(
-        PlaceHolder.homePageContext, MaterialPageRoute(builder: (BuildContext context) => TrashPage()));
+                PlaceHolder.homePageContext,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => TrashPage()));
           },
         ),
         KFDrawerItem.initWithPage(
           text: Text(
             'Settins',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),
           ),
-          icon: Icon(Icons.settings, color: Colors.black),
+          icon: Icon(Icons.settings, color: Color(PlaceHolder.hexToInt(theme[10]))),
           page: ClassBuilder.fromString('SettingsPage'),
-          onPressed: (){
-            Navigator.push(
-        PlaceHolder.homePageContext, MaterialPageRoute(builder: (ctx) => SettingsOnePage()));
+          onPressed: () {
+            Navigator.push(PlaceHolder.homePageContext,
+                MaterialPageRoute(builder: (ctx) => SettingsOnePage()));
           },
         ),
       ],
     );
   }
-void _newNoteTapped(BuildContext ctx) {
+
+  onchange() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    double fontsize = pref.getDouble("fontsize");
+    String theme = pref.getString("theme");
+    if (fontsize == null) {
+      pref.setDouble("fontsize", 13.0);
+      PlaceHolder.fontsize = 13.0;
+    }
+    if (theme == null) {
+      pref.setString("theme", "t1");
+      PlaceHolder.theme = PlaceHolder.theme1;
+    }
+    if (fontsize != null && theme != null) {
+      setState(() {
+        String ttype = pref.getString("theme");
+        PlaceHolder.fontsize = pref.getDouble("fontsize");
+        //PlaceHolder.theme = PlaceHolder.theme4;
+        if (ttype == "t1") {
+          PlaceHolder.theme = PlaceHolder.theme1;
+          PlaceHolder.logo=PlaceHolder.logoGrey;
+        } else if (ttype == "t2") {
+          PlaceHolder.theme = PlaceHolder.theme2;
+          PlaceHolder.logo=PlaceHolder.logoGrey;
+        } else if (ttype == "t3") {
+          PlaceHolder.theme = PlaceHolder.theme3;
+          PlaceHolder.logo=PlaceHolder.logoBlue;
+        } else if (ttype == "t4") {
+          PlaceHolder.theme = PlaceHolder.theme4;
+          PlaceHolder.logo=PlaceHolder.logoGreen;
+        }
+      });
+
+      String df = " ";
+    }
+  }
+
+  void _newNoteTapped(BuildContext ctx) {
     // "-1" id indicates the note is not new
-    var emptyNote =
-        new Note(-1, "", "", DateTime.now(), DateTime.now(), Colors.white,0,0);
+    var emptyNote = new Note(
+        -1, "", "", DateTime.now(), DateTime.now(), Colors.white, 0, 0);
     Navigator.push(
         ctx, MaterialPageRoute(builder: (ctx) => NotePage(emptyNote)));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +139,7 @@ void _newNoteTapped(BuildContext ctx) {
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             width: MediaQuery.of(context).size.width * 0.6,
             child: Image.asset(
-              "Assets/logo2.png",
+              logo,
               height: 150,
               width: 150,
             ),
@@ -103,11 +154,11 @@ void _newNoteTapped(BuildContext ctx) {
         footer: KFDrawerItem(
           text: Text(
             'Help & Feedback',
-            style: TextStyle(color: Colors.black),
+            style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),
           ),
           icon: Icon(
             Icons.help_outline,
-            color: Colors.black,
+            color: Color(PlaceHolder.hexToInt(theme[1])),
           ),
           onPressed: () {
             Navigator.of(context).push(CupertinoPageRoute(
@@ -123,8 +174,8 @@ void _newNoteTapped(BuildContext ctx) {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color.fromRGBO(191, 204, 194, 1.0),
-              Color.fromRGBO(85, 85, 85, 1.0)
+              Color(PlaceHolder.hexToInt(theme[1])),
+              Color(PlaceHolder.hexToInt(theme[10]))
             ],
             //colors: [Colors.green],
             tileMode: TileMode.repeated,

@@ -4,6 +4,7 @@ import '../Models/Utility.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './drower_page.dart';
 import 'dart:io';
+import '../Models/PlaceHolder.dart';
 
 class TrashPage extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class TrashPage extends StatefulWidget {
 }
 
 class TrashPageState extends State<TrashPage> {
+  List<String> theme=PlaceHolder.theme;
   var notesViewType;
 
   @override
@@ -29,12 +31,12 @@ class TrashPageState extends State<TrashPage> {
           appBar: AppBar(
             actions: <Widget>[
               IconButton(
-                color: Colors.black,
+                color: Color(PlaceHolder.hexToInt(theme[1])),
                 icon: Icon(
                   notesViewType == 1
                       ? Icons.developer_board
                       : Icons.view_headline,
-                  color: CentralStation.fontColor,
+                  color: Color(PlaceHolder.hexToInt(theme[1])),
                 ),
                 iconSize: 25,
                 onPressed: () {
@@ -49,14 +51,15 @@ class TrashPageState extends State<TrashPage> {
               onPressed: _backToHome,
               icon: Icon(
                 MdiIcons.backburger,
-                color: Colors.black,
+                color: Color(PlaceHolder.hexToInt(theme[1])),
               ),
             ),
             automaticallyImplyLeading: false,
-            backgroundColor: Colors.grey,
+            backgroundColor: Color(PlaceHolder.hexToInt(theme[0])),
             centerTitle: true,
-            title: Text("Trash Page"),
+            title: Text("Trash Page",style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),),
           ),
+          backgroundColor: Color(PlaceHolder.hexToInt(theme[1])),
           body: SafeArea(
             child: _body(),
             right: true,
