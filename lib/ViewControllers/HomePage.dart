@@ -108,10 +108,10 @@ class _HomePageState extends State<HomePage> {
         if (ftype == "f1") {
           PlaceHolder.fontsize = PlaceHolder.fontsize1;
           PlaceHolder.fs=0;
-        } else if (ttype == "f2") {
+        } else if (ftype == "f2") {
           PlaceHolder.fontsize = PlaceHolder.fontsize2;
           PlaceHolder.fs=1;
-        } else if (ttype == "f3") {
+        } else if (ftype == "f3") {
           PlaceHolder.fontsize = PlaceHolder.fontsize3;
           PlaceHolder.fs=2;
         }

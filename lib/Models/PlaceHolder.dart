@@ -11,6 +11,12 @@ class PlaceHolder {
   static String logoBlue="Assets/logo-blue.png";
   static String logoGrey="Assets/logo-grey.png";
   static String logo;
+  static int ts=0;
+  static int fs=0;
+  static double fontsize1=13;
+  static double fontsize2=23;
+  static double fontsize3=30;
+
 
 
   static List<String> theme1 = [
