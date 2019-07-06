@@ -75,29 +75,45 @@ class _HomePageState extends State<HomePage> {
 
   onchange() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    double fontsize = pref.getDouble("fontsize");
+   String fontsize = pref.getString("fontsize");
     String theme = pref.getString("theme");
     if (fontsize == null) {
-      pref.setDouble("fontsize", 13.0);
-      PlaceHolder.fontsize = 13.0;
+       pref.setString("fontsize", "f2");
+      PlaceHolder.fontsize = PlaceHolder.fontsize2;
+      PlaceHolder.fs=1;
     }
     if (theme == null) {
-      pref.setString("theme", "t1");
-      PlaceHolder.theme = PlaceHolder.theme1;
+      pref.setString("theme", "t2");
+      PlaceHolder.theme = PlaceHolder.theme2;
+      PlaceHolder.ts=1;
     }
     if (fontsize != null && theme != null) {
       setState(() {
         String ttype = pref.getString("theme");
-        PlaceHolder.fontsize = pref.getDouble("fontsize");
-        //PlaceHolder.theme = PlaceHolder.theme4;
+       String ftype = pref.getString("fontsize");
+
         if (ttype == "t1") {
           PlaceHolder.theme = PlaceHolder.theme1;
+          PlaceHolder.ts=0;
         } else if (ttype == "t2") {
           PlaceHolder.theme = PlaceHolder.theme2;
+          PlaceHolder.ts=1;
         } else if (ttype == "t3") {
           PlaceHolder.theme = PlaceHolder.theme3;
+          PlaceHolder.ts=2;
         } else if (ttype == "t4") {
           PlaceHolder.theme = PlaceHolder.theme4;
+          PlaceHolder.ts=3;
+        }
+        if (ftype == "f1") {
+          PlaceHolder.fontsize = PlaceHolder.fontsize1;
+          PlaceHolder.fs=0;
+        } else if (ttype == "f2") {
+          PlaceHolder.fontsize = PlaceHolder.fontsize2;
+          PlaceHolder.fs=1;
+        } else if (ttype == "f3") {
+          PlaceHolder.fontsize = PlaceHolder.fontsize3;
+          PlaceHolder.fs=2;
         }
       });
 

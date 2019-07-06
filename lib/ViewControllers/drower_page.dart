@@ -30,11 +30,11 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     theme = PlaceHolder.theme ?? PlaceHolder.theme1;
-    logo=PlaceHolder.logo??PlaceHolder.logoGrey;
+    logo = PlaceHolder.logo ?? PlaceHolder.logoGrey;
     onchange().then((_) {
       setState(() {
         theme = PlaceHolder.theme ?? PlaceHolder.theme1;
-        logo=PlaceHolder.logo??PlaceHolder.logoGrey;
+        logo = PlaceHolder.logo ?? PlaceHolder.logoGrey;
       });
     });
     //onchange();
@@ -42,7 +42,8 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
       initialPage: ClassBuilder.fromString('MainPage'),
       items: [
         KFDrawerItem.initWithPage(
-          text: Text('New Note', style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1])))),
+          text: Text('New Note',
+              style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1])))),
           icon: Icon(Icons.note, color: Color(PlaceHolder.hexToInt(theme[10]))),
           page: MainPage(),
           onPressed: () {
@@ -54,7 +55,8 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
             'Trash',
             style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),
           ),
-          icon: Icon(Icons.delete, color: Color(PlaceHolder.hexToInt(theme[10]))),
+          icon:
+              Icon(Icons.delete, color: Color(PlaceHolder.hexToInt(theme[10]))),
           page: CalendarPage(),
           onPressed: () {
             Navigator.pushReplacement(
@@ -68,7 +70,8 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
             'Settins',
             style: TextStyle(color: Color(PlaceHolder.hexToInt(theme[1]))),
           ),
-          icon: Icon(Icons.settings, color: Color(PlaceHolder.hexToInt(theme[10]))),
+          icon: Icon(Icons.settings,
+              color: Color(PlaceHolder.hexToInt(theme[10]))),
           page: ClassBuilder.fromString('SettingsPage'),
           onPressed: () {
             Navigator.push(PlaceHolder.homePageContext,
@@ -81,37 +84,46 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
 
   onchange() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    double fontsize = pref.getDouble("fontsize");
+    String fontsize = pref.getString("fontsize");
     String theme = pref.getString("theme");
     if (fontsize == null) {
-      pref.setDouble("fontsize", 13.0);
-      PlaceHolder.fontsize = 13.0;
+      pref.setString("fontsize", "f2");
+      PlaceHolder.fontsize = PlaceHolder.fontsize2;
+      PlaceHolder.fs=1;
     }
     if (theme == null) {
-      pref.setString("theme", "t1");
-      PlaceHolder.theme = PlaceHolder.theme1;
+      pref.setString("theme", "t2");
+      PlaceHolder.theme = PlaceHolder.theme2;
+      PlaceHolder.ts=1;
     }
     if (fontsize != null && theme != null) {
       setState(() {
         String ttype = pref.getString("theme");
-        PlaceHolder.fontsize = pref.getDouble("fontsize");
-        //PlaceHolder.theme = PlaceHolder.theme4;
+        String ftype = pref.getString("fontsize");
+
         if (ttype == "t1") {
           PlaceHolder.theme = PlaceHolder.theme1;
-          PlaceHolder.logo=PlaceHolder.logoGrey;
+          PlaceHolder.logo = PlaceHolder.logoGrey;
         } else if (ttype == "t2") {
           PlaceHolder.theme = PlaceHolder.theme2;
-          PlaceHolder.logo=PlaceHolder.logoGrey;
+          PlaceHolder.logo = PlaceHolder.logoGrey;
         } else if (ttype == "t3") {
           PlaceHolder.theme = PlaceHolder.theme3;
-          PlaceHolder.logo=PlaceHolder.logoBlue;
+          PlaceHolder.logo = PlaceHolder.logoBlue;
         } else if (ttype == "t4") {
           PlaceHolder.theme = PlaceHolder.theme4;
-          PlaceHolder.logo=PlaceHolder.logoGreen;
+          PlaceHolder.logo = PlaceHolder.logoGreen;
+        }
+        if (ftype == "f1") {
+          PlaceHolder.fontsize = PlaceHolder.fontsize1;
+        } else if (ttype == "f2") {
+          PlaceHolder.fontsize = PlaceHolder.fontsize2;
+        } else if (ttype == "f3") {
+          PlaceHolder.fontsize = PlaceHolder.fontsize3;
         }
       });
 
-      String df = " ";
+      
     }
   }
 

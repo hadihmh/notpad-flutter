@@ -14,8 +14,8 @@ class SettingsOnePage extends StatefulWidget {
 }
 
 class SettingsOnePageState extends State<SettingsOnePage> {
-  int _themeValue = 0;
-  int _fontValue = 0;
+  int _themeValue = PlaceHolder.ts;
+  int _fontValue = PlaceHolder.fs;
 
   Widget bodyData() => SingleChildScrollView(
         child: Theme(
@@ -107,6 +107,7 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                             PlaceHolder.theme =
                                                 PlaceHolder.theme1;
                                             theme = PlaceHolder.theme1;
+                                            PlaceHolder.ts = 0;
                                           });
                                         });
                                       }),
@@ -134,6 +135,7 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                               PlaceHolder.theme =
                                                   PlaceHolder.theme2;
                                               theme = PlaceHolder.theme2;
+                                              PlaceHolder.ts = 1;
                                             });
                                           });
                                         }),
@@ -169,6 +171,7 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                             PlaceHolder.theme =
                                                 PlaceHolder.theme3;
                                             theme = PlaceHolder.theme3;
+                                            PlaceHolder.ts = 2;
                                           });
                                         });
                                       }),
@@ -205,6 +208,7 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                             PlaceHolder.theme =
                                                 PlaceHolder.theme4;
                                             theme = PlaceHolder.theme4;
+                                            PlaceHolder.ts = 3;
                                           });
                                         });
                                       }),
@@ -269,8 +273,17 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                 title: Text("Small"),
                                 trailing: Radio(
                                   groupValue: _fontValue,
-                                  onChanged: (int i) =>
-                                      setState(() => _fontValue = i),
+                                  onChanged: (int i) => setState(() {
+                                        _fontValue = i;
+                                        _bulidTheme().then((_) {
+                                          setState(() {
+                                            PlaceHolder.fontsize =
+                                                PlaceHolder.fontsize1;
+
+                                            PlaceHolder.fs = 0;
+                                          });
+                                        });
+                                      }),
                                   value: 0,
                                 ),
                               ),
@@ -290,8 +303,17 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                   ),
                                   trailing: Radio(
                                     groupValue: _fontValue,
-                                    onChanged: (int i) =>
-                                        setState(() => _fontValue = i),
+                                    onChanged: (int i) => setState(() {
+                                          _fontValue = i;
+                                          _bulidTheme().then((_) {
+                                            setState(() {
+                                              PlaceHolder.fontsize =
+                                                  PlaceHolder.fontsize2;
+
+                                              PlaceHolder.fs = 1;
+                                            });
+                                          });
+                                        }),
                                     value: 1,
                                   ),
                                 )),
@@ -311,7 +333,14 @@ class SettingsOnePageState extends State<SettingsOnePage> {
                                   groupValue: _fontValue,
                                   onChanged: (int i) => setState(() {
                                         _fontValue = i;
-                                        print(_fontValue);
+                                        _bulidTheme().then((_) {
+                                          setState(() {
+                                            PlaceHolder.fontsize =
+                                                PlaceHolder.fontsize3;
+
+                                            PlaceHolder.fs = 2;
+                                          });
+                                        });
                                       }),
                                   value: 2,
                                 ),
@@ -330,37 +359,7 @@ class SettingsOnePageState extends State<SettingsOnePage> {
   List<String> theme;
   @override
   void initState() {
-    onchange().then((_) {
-      setState(() {
-        theme = PlaceHolder.theme ?? PlaceHolder.theme1;
-      });
-    });
-
-    // theme = PlaceHolder.theme ?? _def;
-    // PlaceHolder.theme = _def;
-  }
-
-  onchange() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-
-    setState(() {
-      String ttype = pref.getString("theme");
-      PlaceHolder.fontsize = pref.getDouble("fontsize");
-      //PlaceHolder.theme = PlaceHolder.theme4;
-      if (ttype == "t1") {
-        PlaceHolder.theme = PlaceHolder.theme1;
-        _themeValue = 0;
-      } else if (ttype == "t2") {
-        PlaceHolder.theme = PlaceHolder.theme2;
-        _themeValue = 1;
-      } else if (ttype == "t3") {
-        PlaceHolder.theme = PlaceHolder.theme3;
-        _themeValue = 2;
-      } else if (ttype == "t4") {
-        PlaceHolder.theme = PlaceHolder.theme4;
-        _themeValue = 3;
-      }
-    });
+    theme = PlaceHolder.theme ?? PlaceHolder.theme1;
   }
 
   @override
@@ -400,11 +399,11 @@ class SettingsOnePageState extends State<SettingsOnePage> {
     final SharedPreferences pref = await SharedPreferences.getInstance();
 
     if (_fontValue == 0) {
-      pref.setDouble("fontsize", 13.0);
+      pref.setString("fontsize", "f1");
     } else if (_fontValue == 1) {
-      pref.setDouble("fontsize", 23.0);
+      pref.setString("fontsize", "f2");
     } else if (_fontValue == 2) {
-      pref.setDouble("fontsize", 30.0);
+      pref.setString("fontsize", "f3");
     }
 
     if (_themeValue == 0) {
