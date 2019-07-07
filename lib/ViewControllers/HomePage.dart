@@ -1,4 +1,4 @@
-import 'package:demo_13/Models/PlaceHolder.dart';
+import '../Models/PlaceHolder.dart';
 
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -9,6 +9,7 @@ import '../Models/Utility.dart';
 import '../Models/FabBottomAppBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:popup_menu/popup_menu.dart';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
   @override
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String fontsize = pref.getString("fontsize");
     String theme = pref.getString("theme");
-    
+
     if (fontsize == null) {
       pref.setString("fontsize", "f2");
       PlaceHolder.fontsize = PlaceHolder.fontsize2;
@@ -101,7 +102,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    PlaceHolder.sstate=_homeSState;
+    PlaceHolder.sstate = _homeSState;
     PopupMenu.context = context;
     PlaceHolder.homePageContext = context;
     return WillPopScope(
@@ -132,13 +133,18 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ),
-        onWillPop: () async => Future.value(false));
+        onWillPop: () async {
+          Future.value(false);
+          exit(0);
+        });
   }
-void _homeSState(){
-  setState(() {
-   int a=0; 
-  });
-}
+
+  void _homeSState() {
+    setState(() {
+      int a = 0;
+    });
+  }
+
   Widget _body() {
     print(notesViewType);
     return Container(

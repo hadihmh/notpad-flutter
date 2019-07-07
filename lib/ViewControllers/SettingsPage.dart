@@ -386,7 +386,10 @@ class SettingsOnePageState extends State<SettingsOnePage> {
         backgroundColor: Color(PlaceHolder.hexToInt(theme[1])),
         body: bodyData(),
       ),
-      onWillPop: () async => Future.value(false),
+      onWillPop: () async {
+          Future.value(false);
+          _readyToPop();
+        }
     );
   }
 

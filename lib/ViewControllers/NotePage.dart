@@ -1,5 +1,5 @@
-import 'package:demo_13/ViewControllers/HomePage.dart';
-import 'package:demo_13/ViewControllers/TrashPage.dart';
+import '../ViewControllers/HomePage.dart';
+import '../ViewControllers/TrashPage.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../Models/Note.dart';
@@ -102,7 +102,10 @@ class _NotePageState extends State<NotePage> {
           ),
           body: _body(context, deviceHeight, deviceWidth),
         ),
-        onWillPop: () async => Future.value(false)
+        onWillPop:  () async {
+          Future.value(false);
+          _readyToPop();
+        }
         // Navigator.push(
         // context, MaterialPageRoute(builder: (context) => DrawerPage()));
 

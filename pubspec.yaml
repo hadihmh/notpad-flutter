@@ -1,5 +1,5 @@
-name: demo_13
-description: codebook - theme, orientation, form focus.
+name: Note
+description: Simple NoteBook
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -42,12 +42,17 @@ dependencies:
   direct_select_flutter: ^1.0.3
   shared_preferences: ^0.5.3+1
   popup_menu: ^1.0.1
+  flutter_launcher_icons: ^0.7.2+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-
+flutter_icons:
+  android: "launcher_icon" 
+  ios: true
+  image_path: "Assets/logo-grey.png"
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 

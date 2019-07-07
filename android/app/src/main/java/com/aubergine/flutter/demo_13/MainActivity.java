@@ -1,4 +1,4 @@
-package com.aubergine.flutter.demo_13;
+package com.hmh.note;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

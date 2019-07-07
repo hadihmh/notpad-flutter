@@ -1,5 +1,5 @@
-import 'package:demo_13/Models/Note.dart';
-import 'package:demo_13/ViewControllers/TrashPage.dart';
+import '../Models/Note.dart';
+import '../ViewControllers/TrashPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kf_drawer/kf_drawer.dart';
