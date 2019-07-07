@@ -5,14 +5,22 @@
 
 a simple and smart notebook with beautiful and smooth user interface that you can save all you need .
 
+
 features :
 
+
 simple and fast usage
+
 beautiful user interface
+
 archive important notes
+
 copy your note's content
+
 change theme
+
 change font size
+
 
 
 
