@@ -14,6 +14,7 @@ import 'NotePage.dart';
 import './SettingsPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/AboutUs.dart';
+import '../screens/profile_one_page.dart';
 
 class DrawerPage extends StatefulWidget {
   DrawerPage({Key key, this.title}) : super(key: key);
@@ -175,7 +176,7 @@ class _DrawerPageState extends State<DrawerPage> with TickerProviderStateMixin {
           ),
           onPressed: () {
            Navigator.push(PlaceHolder.homePageContext,
-                MaterialPageRoute(builder: (ctx) => AboutUs()));
+                MaterialPageRoute(builder: (ctx) => ProfileOnePage()));
           },
         ),
         decoration: BoxDecoration(

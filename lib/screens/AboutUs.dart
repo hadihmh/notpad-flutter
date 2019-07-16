@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../Models/PlaceHolder.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../ViewControllers/drower_page.dart';
-import 'dart:io';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class AboutUs extends StatelessWidget {
   @override
@@ -35,14 +37,18 @@ class AboutUs extends StatelessWidget {
           ),
           body: Center(
             child: Container(
-              child: Text(
-                "There is nothing to show !!",
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Color(
-                      PlaceHolder.hexToInt(theme[10]),
-                    )),
-              ),
+              child: InkWell(
+              child: new Text('Open Browser'),
+              onTap: () => launch('myket://details?id=com.hmh.note')
+          ),
+              // child: Text(
+              //   "There is nothing to show !!",
+              //   style: TextStyle(
+              //       fontSize: 20,
+              //       color: Color(
+              //         PlaceHolder.hexToInt(theme[10]),
+              //       )),
+              // ),
             ),
           ),
         ),
