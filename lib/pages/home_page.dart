@@ -4,6 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../data/note.dart';
 import '../data/notes_db.dart';
 import '../data/settings.dart';
+import '../l10n.dart';
 import '../utils.dart';
 import 'note_page.dart';
 import 'settings_page.dart';
@@ -59,8 +60,8 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
-        content: Text(message),
-        action: SnackBarAction(label: 'Undo', onPressed: () async {
+        content: Text(tr(message)),
+        action: SnackBarAction(label: tr('Undo'), onPressed: () async {
           undo();
           await _db.save(note);
           _reload();
@@ -76,14 +77,14 @@ class _HomePageState extends State<HomePage> {
   void _restore(Note n) => _update(n, () => n.deleted = false, 'Note restored', () => n.deleted = true);
 
   Future<void> _deleteForever(Note n) async {
-    if (await _confirm('Delete this note forever?')) {
+    if (await _confirm(tr('Delete this note forever?'))) {
       await _db.deleteForever(n);
       _reload();
     }
   }
 
   Future<void> _emptyTrash() async {
-    if (_notes.isNotEmpty && await _confirm('Delete all ${_notes.length} notes in trash forever?')) {
+    if (_notes.isNotEmpty && await _confirm(tr('Delete all {n} notes in trash forever?', {'n': _notes.length}))) {
       await _db.emptyTrash();
       _reload();
     }
@@ -95,8 +96,8 @@ class _HomePageState extends State<HomePage> {
         builder: (c) => AlertDialog(
           content: Text(message),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Delete')),
+            TextButton(onPressed: () => Navigator.pop(c, false), child: Text(tr('Cancel'))),
+            FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(tr('Delete'))),
           ],
         ),
       ) ??
@@ -110,7 +111,7 @@ class _HomePageState extends State<HomePage> {
       builder: (c) {
         Widget item(IconData icon, String label, VoidCallback onTap) => ListTile(
               leading: Icon(icon),
-              title: Text(label),
+              title: Text(tr(label)),
               onTap: () {
                 Navigator.pop(c);
                 onTap();
@@ -157,36 +158,36 @@ class _HomePageState extends State<HomePage> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 16, 16, 12),
-            child: Text('Note', style: Theme.of(context).textTheme.titleLarge),
+            child: Text(tr('Note'), style: Theme.of(context).textTheme.titleLarge),
           ),
           for (final s in Section.values)
-            NavigationDrawerDestination(icon: Icon(_icons[s]), label: Text(_titles[s]!)),
+            NavigationDrawerDestination(icon: Icon(_icons[s]), label: Text(tr(_titles[s]!))),
           const Divider(indent: 28, endIndent: 28),
-          const NavigationDrawerDestination(icon: Icon(Icons.settings_outlined), label: Text('Settings')),
+          NavigationDrawerDestination(icon: const Icon(Icons.settings_outlined), label: Text(tr('Settings'))),
         ],
       ),
       appBar: AppBar(
         title: _section == Section.notes
             ? SearchBar(
-                hintText: 'Search your notes',
+                hintText: tr('Search your notes'),
                 elevation: const WidgetStatePropertyAll(0),
                 leading: const Icon(Icons.search),
                 onChanged: (q) => setState(() => _query = q.trim()),
               )
-            : Text(_titles[_section]!),
+            : Text(tr(_titles[_section]!)),
         actions: [
           IconButton(
-            tooltip: settings.gridView ? 'List view' : 'Grid view',
+            tooltip: settings.gridView ? tr('List view') : tr('Grid view'),
             icon: Icon(settings.gridView ? Icons.view_agenda_outlined : Icons.grid_view),
             onPressed: () => setState(settings.toggleGrid),
           ),
           if (_section == Section.trash)
-            IconButton(tooltip: 'Empty trash', icon: const Icon(Icons.delete_sweep_outlined), onPressed: _emptyTrash),
+            IconButton(tooltip: tr('Empty trash'), icon: const Icon(Icons.delete_sweep_outlined), onPressed: _emptyTrash),
         ],
       ),
       floatingActionButton: _section == Section.notes
           ? FloatingActionButton(
-              tooltip: 'New note',
+              tooltip: tr('New note'),
               onPressed: () => _open(Note()),
               child: const Icon(Icons.edit_outlined),
             )
@@ -224,7 +225,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(_icons[_section], size: 72, color: color),
         const SizedBox(height: 12),
-        Text(text, style: TextStyle(color: color)),
+        Text(tr(text), style: TextStyle(color: color)),
       ]),
     );
   }

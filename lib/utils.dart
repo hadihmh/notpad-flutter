@@ -2,20 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' as intl;
 
-/// RTL for Persian/Arabic text, LTR otherwise (based on the first strong character).
-TextDirection directionOf(String text) =>
-    intl.Bidi.startsWithRtl(text) ? TextDirection.rtl : TextDirection.ltr;
+import 'data/settings.dart';
+import 'l10n.dart';
+
+/// Direction from the first strong character; null (follow the UI language) when there is none, e.g. empty.
+TextDirection? directionOf(String text) => intl.Bidi.startsWithRtl(text)
+    ? TextDirection.rtl
+    : intl.Bidi.hasAnyLtr(text)
+        ? TextDirection.ltr
+        : null;
 
 String editedLabel(DateTime dt, [DateTime? now]) {
   now ??= DateTime.now();
-  final day = DateTime(dt.year, dt.month, dt.day);
-  final today = DateTime(now.year, now.month, now.day);
-  final days = today.difference(day).inDays;
-  final time = intl.DateFormat('h:mm a').format(dt);
-  if (days == 0) return 'Edited $time';
-  if (days == 1) return 'Edited yesterday, $time';
-  if (dt.year == now.year) return 'Edited ${intl.DateFormat('MMM d').format(dt)}';
-  return 'Edited ${intl.DateFormat('MMM d, y').format(dt)}';
+  // UTC midnights so a DST change can't turn "yesterday" into "today".
+  final days = DateTime.utc(now.year, now.month, now.day).difference(DateTime.utc(dt.year, dt.month, dt.day)).inDays;
+  final fa = settings.isFa;
+  final time = intl.DateFormat(fa ? 'H:mm' : 'h:mm a').format(dt);
+  if (days == 0) return tr('Edited {time}', {'time': time});
+  if (days == 1) return tr('Edited yesterday, {time}', {'time': time});
+  final String date;
+  if (fa) {
+    date = jalaliLabel(dt, withYear: toJalali(dt).$1 != toJalali(now).$1);
+  } else {
+    date = intl.DateFormat(dt.year == now.year ? 'MMM d' : 'MMM d, y').format(dt);
+  }
+  return tr('Edited {date}', {'date': date});
 }
 
 const _shareChannel = MethodChannel('com.hmh.note/share');
@@ -33,7 +44,7 @@ Future<void> shareText(BuildContext context, String text) async {
 Future<void> copyText(BuildContext context, String text) async {
   await Clipboard.setData(ClipboardData(text: text));
   if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Copied to clipboard'))));
   }
 }
 

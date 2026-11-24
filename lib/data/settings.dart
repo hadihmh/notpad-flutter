@@ -13,7 +13,9 @@ class AppSettings extends ChangeNotifier {
   int fontIndex = 1;
   ThemeMode themeMode = ThemeMode.system;
   bool gridView = true;
+  String lang = 'fa';
 
+  bool get isFa => lang == 'fa';
   Color get seed => themeSeeds[themeIndex];
   double get fontSize => fontSizes[fontIndex];
 
@@ -24,7 +26,10 @@ class AppSettings extends ChangeNotifier {
     themeMode = ThemeMode.values.firstWhere((m) => m.name == p.getString('theme_mode'),
         orElse: () => ThemeMode.system);
     gridView = p.getBool('grid_view') ?? true;
+    lang = p.getString('lang') == 'en' ? 'en' : 'fa';
   }
+
+  void setLang(String l) => _set(() => lang = l, () => _prefs?.setString('lang', l));
 
   void setTheme(int i) => _set(() => themeIndex = i, () => _prefs?.setString('theme', 't${i + 1}'));
   void setFont(int i) => _set(() => fontIndex = i, () => _prefs?.setString('fontsize', 'f${i + 1}'));

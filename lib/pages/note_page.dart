@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../data/note.dart';
 import '../data/notes_db.dart';
 import '../data/settings.dart';
+import '../l10n.dart';
 import '../utils.dart';
 
 class NotePage extends StatefulWidget {
@@ -104,7 +105,7 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
               Semantics(
                 button: true,
                 selected: color == _note.color,
-                label: color == Note.white ? 'Default color' : 'Color',
+                label: color == Note.white ? tr('Default color') : tr('Color'),
                 child: InkWell(
                   customBorder: const CircleBorder(),
                   onTap: () {
@@ -145,9 +146,9 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
           backgroundColor: bg,
           foregroundColor: fg,
           actions: [
-            IconButton(tooltip: 'Color', icon: const Icon(Icons.palette_outlined), onPressed: _pickColor),
+            IconButton(tooltip: tr('Color'), icon: const Icon(Icons.palette_outlined), onPressed: _pickColor),
             IconButton(
-              tooltip: _note.archived ? 'Unarchive' : 'Archive',
+              tooltip: _note.archived ? tr('Unarchive') : tr('Archive'),
               icon: Icon(_note.archived ? Icons.unarchive_outlined : Icons.archive_outlined),
               onPressed: _toggleArchive,
             ),
@@ -156,16 +157,16 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
               itemBuilder: (_) => [
                 PopupMenuItem(
                     value: () => shareText(context, [_title.text, _content.text].join('\n\n').trim()),
-                    child: const ListTile(leading: Icon(Icons.share_outlined), title: Text('Share'))),
+                    child: ListTile(leading: const Icon(Icons.share_outlined), title: Text(tr('Share')))),
                 PopupMenuItem(
                     value: () => copyText(context, [_title.text, _content.text].join('\n\n').trim()),
-                    child: const ListTile(leading: Icon(Icons.copy_outlined), title: Text('Copy'))),
+                    child: ListTile(leading: const Icon(Icons.copy_outlined), title: Text(tr('Copy')))),
                 PopupMenuItem(
                     value: _undoChanges,
-                    child: const ListTile(leading: Icon(Icons.undo), title: Text('Undo changes'))),
+                    child: ListTile(leading: const Icon(Icons.undo), title: Text(tr('Undo changes')))),
                 PopupMenuItem(
                     value: _trash,
-                    child: const ListTile(leading: Icon(Icons.delete_outline), title: Text('Move to trash'))),
+                    child: ListTile(leading: const Icon(Icons.delete_outline), title: Text(tr('Move to trash')))),
               ],
             ),
           ],
@@ -180,7 +181,7 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
                   textCapitalization: TextCapitalization.sentences,
                   style: text.headlineSmall?.copyWith(color: fg),
                   decoration: InputDecoration(
-                      hintText: 'Title', border: InputBorder.none, hintStyle: TextStyle(color: hint)),
+                      hintText: tr('Title'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
                   maxLines: null,
                 ),
                 TextField(
@@ -191,7 +192,7 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
                   keyboardType: TextInputType.multiline,
                   style: TextStyle(fontSize: settings.fontSize, height: 1.5, color: fg),
                   decoration: InputDecoration(
-                      hintText: 'Note', border: InputBorder.none, hintStyle: TextStyle(color: hint)),
+                      hintText: tr('Note'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
                   maxLines: null,
                 ),
               ]),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'data/settings.dart';
 import 'pages/home_page.dart';
@@ -19,9 +20,12 @@ class NoteApp extends StatelessWidget {
       builder: (context, _) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Note',
+        locale: Locale(settings.lang),
+        supportedLocales: const [Locale('fa'), Locale('en')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         themeMode: settings.themeMode,
-        theme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.light),
-        darkTheme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.dark),
+        theme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.light, fontFamily: 'Vazirmatn'),
+        darkTheme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.dark, fontFamily: 'Vazirmatn'),
         home: const HomePage(),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../data/settings.dart';
+import '../l10n.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -17,22 +18,34 @@ class SettingsPage extends StatelessWidget {
     final header = Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.primary);
     Widget section(String title) => Padding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-          child: Text(title, style: header),
+          child: Text(tr(title), style: header),
         );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(tr('Settings'))),
       body: ListenableBuilder(
         listenable: settings,
         builder: (context, _) => ListView(children: [
+          section('Language'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(value: 'fa', label: Text('فارسی')),
+                ButtonSegment(value: 'en', label: Text('English')),
+              ],
+              selected: {settings.lang},
+              onSelectionChanged: (s) => settings.setLang(s.first),
+            ),
+          ),
           section('Appearance'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SegmentedButton<ThemeMode>(
-              segments: const [
-                ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_outlined), label: Text('Light')),
-                ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.brightness_auto_outlined), label: Text('System')),
-                ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_outlined), label: Text('Dark')),
+              segments: [
+                ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_outlined), label: Text(tr('Light'))),
+                ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.brightness_auto_outlined), label: Text(tr('System'))),
+                ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_outlined), label: Text(tr('Dark'))),
               ],
               selected: {settings.themeMode},
               onSelectionChanged: (s) => settings.setThemeMode(s.first),
@@ -45,7 +58,7 @@ class SettingsPage extends StatelessWidget {
               for (var i = 0; i < AppSettings.themeSeeds.length; i++)
                 ChoiceChip(
                   avatar: CircleAvatar(backgroundColor: AppSettings.themeSeeds[i]),
-                  label: Text(AppSettings.themeNames[i]),
+                  label: Text(tr(AppSettings.themeNames[i])),
                   selected: settings.themeIndex == i,
                   onSelected: (_) => settings.setTheme(i),
                 ),
@@ -57,7 +70,7 @@ class SettingsPage extends StatelessWidget {
             child: SegmentedButton<int>(
               segments: [
                 for (var i = 0; i < AppSettings.fontNames.length; i++)
-                  ButtonSegment(value: i, label: Text(AppSettings.fontNames[i])),
+                  ButtonSegment(value: i, label: Text(tr(AppSettings.fontNames[i]))),
               ],
               selected: {settings.fontIndex},
               onSelectionChanged: (s) => settings.setFont(s.first),
@@ -67,13 +80,13 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: ClipRRect(
                 borderRadius: BorderRadius.circular(8), child: Image.asset('Assets/logo-grey.png', width: 40)),
-            title: const Text('Note'),
-            subtitle: const Text('A simple, fast notebook · v2.0'),
+            title: Text(tr('Note')),
+            subtitle: Text(tr('A simple, fast notebook · v{v}', {'v': '2.1'})),
           ),
           for (final (icon, label, url) in _links)
             ListTile(
               leading: Icon(icon),
-              title: Text(label),
+              title: Text(tr(label)),
               onTap: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
             ),
         ]),
