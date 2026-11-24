@@ -21,11 +21,18 @@ void main() {
     expect(Note().toMap().containsKey('id'), isFalse); // new notes get autoincrement id
   });
 
-  test('detects text direction', () {
+  test('text direction follows the dominant language', () {
     expect(directionOf('سلام hello'), TextDirection.rtl);
-    expect(directionOf('  hello سلام'), TextDirection.ltr);
+    expect(directionOf('iPhone 15 قیمت چنده؟'), TextDirection.rtl); // English first word, Persian sentence
+    expect(directionOf('Flutter خیلی خوبه'), TextDirection.rtl);
+    expect(directionOf('Shopping:\nنان\nشیر\nپنیر'), TextDirection.rtl);
+    expect(directionOf('Meeting with Ali فردا'), TextDirection.ltr); // mostly English
+    expect(directionOf('hello world'), TextDirection.ltr);
+    expect(directionOf('(سلام)'), TextDirection.rtl);
     expect(directionOf(''), isNull);
-    expect(directionOf('123 !'), isNull);
+    expect(directionOf('123 !'), isNull); // digits alone don't flip the field
+    expect(directionOf('۱۲۳'), TextDirection.rtl); // Persian digits signal Persian text
+    expect(directionOf('1. نان'), TextDirection.rtl);
   });
 
   test('gregorian to jalali', () {

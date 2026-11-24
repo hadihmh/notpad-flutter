@@ -5,12 +5,24 @@ import 'package:intl/intl.dart' as intl;
 import 'data/settings.dart';
 import 'l10n.dart';
 
-/// Direction from the first strong character; null (follow the UI language) when there is none, e.g. empty.
-TextDirection? directionOf(String text) => intl.Bidi.startsWithRtl(text)
-    ? TextDirection.rtl
-    : intl.Bidi.hasAnyLtr(text)
-        ? TextDirection.ltr
-        : null;
+/// Direction of the language most words are in (RTL from 40% Persian words, like intl's estimate),
+/// so "iPhone 15 قیمت چنده؟" is RTL. Null (follow the UI) when there are no letters,
+/// e.g. empty or only digits, so typing "1" doesn't flip a Persian field to LTR.
+TextDirection? directionOf(String text) {
+  var rtl = 0, words = 0;
+  for (final word in text.split(_space)) {
+    if (intl.Bidi.startsWithRtl(word)) {
+      rtl++;
+      words++;
+    } else if (intl.Bidi.hasAnyLtr(word)) {
+      words++;
+    }
+  }
+  if (words == 0) return null;
+  return rtl > 0.4 * words ? TextDirection.rtl : TextDirection.ltr;
+}
+
+final _space = RegExp(r'\s+');
 
 String editedLabel(DateTime dt, [DateTime? now]) {
   now ??= DateTime.now();
