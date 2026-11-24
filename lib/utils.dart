@@ -59,14 +59,3 @@ Future<void> copyText(BuildContext context, String text) async {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Copied to clipboard'))));
   }
 }
-
-const noteColors = [
-  0xffffffff, 0xfff28b81, 0xfff7bd02, 0xfffbf476, 0xffcdff90, 0xffa7feeb, //
-  0xffcbf0f8, 0xffafcbfa, 0xffd7aefc, 0xfffbcfe9, 0xffe6c9a9, 0xffe9eaee,
-];
-
-/// Background for a note: white follows the theme surface (so dark mode works), others are pastel.
-Color? noteBackground(int color) => color == 0xffffffff ? null : Color(color);
-
-/// Pastel backgrounds always need dark text, even in dark mode.
-Color? noteForeground(int color) => color == 0xffffffff ? null : Colors.black87;

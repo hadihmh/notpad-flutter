@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:note/data/note.dart';
 import 'package:note/data/settings.dart';
 import 'package:note/l10n.dart';
+import 'package:note/theme.dart';
 import 'package:note/utils.dart';
 
 void main() {
@@ -65,6 +66,7 @@ void main() {
     final used = <String>{
       ...AppSettings.themeNames,
       ...AppSettings.fontNames,
+      ...noteTints.map((t) => t.name),
       'Notes', 'Archive', 'Trash', // section titles
     };
     final literal = RegExp(r"""(?:tr|_update\(n, [^,]+,|item\(Icons\.\w+,|section|_confirm)\(?'([^']+)'""");

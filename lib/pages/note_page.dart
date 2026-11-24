@@ -6,6 +6,7 @@ import '../data/note.dart';
 import '../data/notes_db.dart';
 import '../data/settings.dart';
 import '../l10n.dart';
+import '../theme.dart';
 import '../checklist.dart';
 import '../utils.dart';
 
@@ -123,30 +124,21 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
       showDragHandle: true,
       builder: (c) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: Wrap(spacing: 12, runSpacing: 12, alignment: WrapAlignment.center, children: [
-            for (final color in noteColors)
-              Semantics(
-                button: true,
-                selected: color == _note.color,
-                label: color == Note.white ? tr('Default color') : tr('Color'),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
+          padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xl),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(tr('Color'), style: Theme.of(c).textTheme.titleMedium),
+            const SizedBox(height: Space.l),
+            Wrap(spacing: Space.m, runSpacing: Space.m, children: [
+              for (final tint in noteTints)
+                _Swatch(
+                  tint: tint,
+                  selected: tint.key == _note.color,
                   onTap: () {
                     Navigator.pop(c);
-                    _setColor(color);
+                    _setColor(tint.key);
                   },
-                  child: CircleAvatar(
-                    radius: 22,
-                    backgroundColor: Theme.of(c).colorScheme.outlineVariant,
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: color == Note.white ? Theme.of(c).colorScheme.surface : Color(color),
-                      child: color == _note.color ? const Icon(Icons.check, color: Colors.black54) : null,
-                    ),
-                  ),
                 ),
-              ),
+            ]),
           ]),
         ),
       ),
@@ -155,10 +147,11 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final bg = noteBackground(_note.color);
-    final fg = noteForeground(_note.color);
+    final brightness = Theme.of(context).brightness;
+    final bg = noteBackground(_note.color, brightness);
+    final fg = noteForeground(_note.color, brightness);
     final text = Theme.of(context).textTheme;
-    final hint = fg?.withValues(alpha: 0.5);
+    final hint = fg?.withValues(alpha: 0.6);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -213,16 +206,17 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: _checklist ? null : _contentFocus.requestFocus,
-                child: ListView(padding: const EdgeInsets.symmetric(horizontal: 20), children: [
+                child: ListView(padding: const EdgeInsets.fromLTRB(Space.xl, Space.s, Space.xl, Space.xl), children: [
                   TextField(
                     controller: _title,
                     textDirection: directionOf(_title.text),
                     textCapitalization: TextCapitalization.sentences,
-                    style: text.headlineSmall?.copyWith(color: fg),
+                    style: text.headlineSmall?.copyWith(color: fg, fontWeight: FontWeight.w700),
                     decoration: InputDecoration(
                         hintText: tr('Title'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
                     maxLines: null,
                   ),
+                  const SizedBox(height: Space.xs),
                   if (_checklist)
                     ChecklistEditor(
                       key: ValueKey(_checklistKey),
@@ -239,7 +233,7 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
                       textDirection: directionOf(_content.text),
                       textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.multiline,
-                      style: TextStyle(fontSize: settings.fontSize, height: 1.5, color: fg),
+                      style: TextStyle(fontSize: settings.fontSize, height: 1.75, color: fg),
                       decoration: InputDecoration(
                           hintText: tr('Note'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
                       maxLines: null,
@@ -248,10 +242,51 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(editedLabel(_note.edited), style: text.bodySmall?.copyWith(color: fg)),
+              padding: const EdgeInsets.symmetric(horizontal: Space.xl, vertical: Space.m),
+              child: Text(editedLabel(_note.edited),
+                  style: text.bodySmall?.copyWith(color: hint ?? Theme.of(context).colorScheme.onSurfaceVariant)),
             ),
           ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// A 48px color circle (above the 44px touch minimum), ringed and checked when selected.
+class _Swatch extends StatelessWidget {
+  const _Swatch({required this.tint, required this.selected, required this.onTap});
+
+  final NoteTint tint;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final fill = noteBackground(tint.key, theme.brightness) ?? scheme.surface;
+    final mark = noteForeground(tint.key, theme.brightness) ?? scheme.primary;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: tr(tint.name),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: fill,
+            shape: BoxShape.circle,
+            border: Border.all(color: selected ? scheme.primary : scheme.outlineVariant, width: selected ? 2.5 : 1),
+          ),
+          child: selected
+              ? Icon(Icons.check, color: mark)
+              : tint.key == Note.white
+                  ? Icon(Icons.format_color_reset_outlined, size: 20, color: scheme.onSurfaceVariant)
+                  : null,
         ),
       ),
     );

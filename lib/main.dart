@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'data/settings.dart';
 import 'pages/home_page.dart';
+import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,8 +25,8 @@ class NoteApp extends StatelessWidget {
         supportedLocales: const [Locale('fa'), Locale('en')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         themeMode: settings.themeMode,
-        theme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.light, fontFamily: 'Vazirmatn'),
-        darkTheme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.dark, fontFamily: 'Vazirmatn'),
+        theme: buildTheme(settings.seed, Brightness.light),
+        darkTheme: buildTheme(settings.seed, Brightness.dark),
         home: const HomePage(),
       ),
     );

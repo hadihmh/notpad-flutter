@@ -6,6 +6,7 @@ import '../data/note.dart';
 import '../data/notes_db.dart';
 import '../data/settings.dart';
 import '../l10n.dart';
+import '../theme.dart';
 import '../utils.dart';
 import 'note_page.dart';
 import 'settings_page.dart';
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _db = NotesDb.instance;
+  final _scaffold = GlobalKey<ScaffoldState>();
   Section _section = Section.notes;
   List<Note> _notes = [];
   String _query = '';
@@ -118,7 +120,14 @@ class _HomePageState extends State<HomePage> {
           content: Text(message),
           actions: [
             TextButton(onPressed: () => Navigator.pop(c, false), child: Text(tr('Cancel'))),
-            FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(tr('Delete'))),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(c).colorScheme.error,
+                foregroundColor: Theme.of(c).colorScheme.onError,
+              ),
+              onPressed: () => Navigator.pop(c, true),
+              child: Text(tr('Delete')),
+            ),
           ],
         ),
       ) ??
@@ -139,6 +148,7 @@ class _HomePageState extends State<HomePage> {
               },
             );
         return SafeArea(
+          minimum: const EdgeInsets.only(bottom: Space.s),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             if (trash) ...[
               item(Icons.restore_from_trash_outlined, 'Restore', () => _restore(n)),
@@ -171,7 +181,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final notes = _visible;
+    final scheme = Theme.of(context).colorScheme;
+    final viewToggle = IconButton(
+      tooltip: settings.gridView ? tr('List view') : tr('Grid view'),
+      icon: Icon(settings.gridView ? Icons.view_agenda_outlined : Icons.grid_view_outlined),
+      onPressed: () => setState(settings.toggleGrid),
+    );
     return Scaffold(
+      key: _scaffold,
       drawer: NavigationDrawer(
         selectedIndex: _section.index,
         onDestinationSelected: (i) {
@@ -181,59 +198,83 @@ class _HomePageState extends State<HomePage> {
         },
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(28, 16, 16, 12),
-            child: Text(tr('Note'), style: Theme.of(context).textTheme.titleLarge),
+            padding: const EdgeInsetsDirectional.fromSTEB(28, Space.xl, Space.l, Space.l),
+            child: Row(children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(Space.s),
+                child: Image.asset('Assets/logo-grey.png', width: 36, height: 36),
+              ),
+              const SizedBox(width: Space.m),
+              Text(tr('Note'), style: Theme.of(context).textTheme.titleLarge),
+            ]),
           ),
           for (final s in Section.values)
             NavigationDrawerDestination(icon: Icon(_icons[s]), label: Text(tr(_titles[s]!))),
-          const Divider(indent: 28, endIndent: 28),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 28, vertical: Space.s),
+            child: Divider(),
+          ),
           NavigationDrawerDestination(icon: const Icon(Icons.settings_outlined), label: Text(tr('Settings'))),
         ],
       ),
-      appBar: AppBar(
-        title: _section == Section.notes
-            ? SearchBar(
+      appBar: _section == Section.notes
+          // Floating search pill holding the menu and view toggle, like a single toolbar.
+          ? AppBar(
+              automaticallyImplyLeading: false,
+              toolbarHeight: 72,
+              titleSpacing: Space.page,
+              title: SearchBar(
                 hintText: tr('Search your notes'),
-                elevation: const WidgetStatePropertyAll(0),
-                leading: const Icon(Icons.search),
+                leading: IconButton(
+                  tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => _scaffold.currentState?.openDrawer(),
+                ),
+                trailing: [viewToggle],
                 onChanged: (q) => setState(() => _query = q.trim()),
-              )
-            : Text(tr(_titles[_section]!)),
-        actions: [
-          IconButton(
-            tooltip: settings.gridView ? tr('List view') : tr('Grid view'),
-            icon: Icon(settings.gridView ? Icons.view_agenda_outlined : Icons.grid_view),
-            onPressed: () => setState(settings.toggleGrid),
-          ),
-          if (_section == Section.trash)
-            IconButton(
-                tooltip: tr('Empty trash'), icon: const Icon(Icons.delete_sweep_outlined), onPressed: _emptyTrash),
-        ],
-      ),
+              ),
+            )
+          : AppBar(
+              title: Text(tr(_titles[_section]!)),
+              actions: [
+                viewToggle,
+                if (_section == Section.trash)
+                  IconButton(
+                    tooltip: tr('Empty trash'),
+                    icon: const Icon(Icons.delete_sweep_outlined),
+                    onPressed: _emptyTrash,
+                  ),
+                const SizedBox(width: Space.xs),
+              ],
+            ),
       floatingActionButton: _section == Section.notes
-          ? FloatingActionButton(
-              tooltip: tr('New note'),
+          ? FloatingActionButton.extended(
               onPressed: () => _open(Note()),
-              child: const Icon(Icons.edit_outlined),
+              icon: const Icon(Icons.edit_outlined),
+              label: Text(tr('New note')),
             )
           : null,
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : notes.isEmpty
               ? _empty()
-              : MasonryGridView.count(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 96),
-                  crossAxisCount: settings.gridView ? 2 : 1,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  itemCount: notes.length,
-                  itemBuilder: (_, i) => NoteCard(
-                    note: notes[i],
-                    maxLines: settings.gridView ? 10 : 4,
-                    onTap: () => _section == Section.trash ? _showActions(notes[i]) : _open(notes[i]),
-                    onLongPress: () => _showActions(notes[i]),
+              : LayoutBuilder(
+                  // Columns follow the available width (phone 2, tablet 3-4), not the device.
+                  builder: (context, box) => MasonryGridView.count(
+                    padding: const EdgeInsets.fromLTRB(Space.page, Space.xs, Space.page, 96),
+                    crossAxisCount: settings.gridView ? (box.maxWidth / 220).floor().clamp(2, 5) : 1,
+                    mainAxisSpacing: Space.m,
+                    crossAxisSpacing: Space.m,
+                    itemCount: notes.length,
+                    itemBuilder: (_, i) => NoteCard(
+                      note: notes[i],
+                      maxLines: settings.gridView ? 10 : 4,
+                      onTap: () => _section == Section.trash ? _showActions(notes[i]) : _open(notes[i]),
+                      onLongPress: () => _showActions(notes[i]),
+                    ),
                   ),
                 ),
+      backgroundColor: scheme.surface,
     );
   }
 
@@ -245,13 +286,22 @@ class _HomePageState extends State<HomePage> {
             Section.archive => 'Archived notes appear here',
             Section.trash => 'Trash is empty',
           };
-    final color = Theme.of(context).colorScheme.outline;
+    final scheme = Theme.of(context).colorScheme;
     return Center(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(_icons[_section], size: 72, color: color),
-        const SizedBox(height: 12),
-        Text(tr(text), style: TextStyle(color: color)),
-      ]),
+      child: Padding(
+        padding: const EdgeInsets.all(Space.xxl),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          CircleAvatar(
+            radius: 48,
+            backgroundColor: scheme.surfaceContainerHigh,
+            child: Icon(_icons[_section], size: 44, color: scheme.primary),
+          ),
+          const SizedBox(height: Space.l),
+          Text(tr(text),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant)),
+        ]),
+      ),
     );
   }
 }
@@ -266,41 +316,45 @@ class NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = noteForeground(note.color);
-    final text = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final bg = noteBackground(note.color, theme.brightness);
+    final fg = noteForeground(note.color, theme.brightness);
+    final text = theme.textTheme;
+    final hasTitle = note.title.trim().isNotEmpty, hasBody = note.content.trim().isNotEmpty;
     return Card(
-      margin: EdgeInsets.zero,
-      color: noteBackground(note.color),
+      color: bg,
+      // Tinted notes need no outline; default notes keep the theme's hairline border.
+      shape: bg == null ? null : RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.card)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
-        child: Stack(children: [
-          if (note.pinned)
-            PositionedDirectional(
-              top: 8,
-              end: 8,
-              child: Icon(Icons.push_pin, size: 16, color: fg, semanticLabel: tr('Pinned')),
-            ),
-          Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(14, 14, note.pinned ? 28 : 14, 14),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              if (note.title.trim().isNotEmpty)
-                Text(note.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textDirection: directionOf(note.title),
-                    style: text.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w600)),
-              if (note.title.trim().isNotEmpty && note.content.trim().isNotEmpty) const SizedBox(height: 6),
-              if (note.content.trim().isNotEmpty)
-                Text(checklistPreview(note.content).trim(),
-                    maxLines: maxLines,
-                    overflow: TextOverflow.ellipsis,
-                    textDirection: directionOf(note.content),
-                    style: text.bodyMedium?.copyWith(color: fg)),
-            ]),
-          ),
-        ]),
+        child: Padding(
+          padding: const EdgeInsets.all(Space.l),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            if (hasTitle || note.pinned)
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(
+                  child: Text(note.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textDirection: directionOf(note.title),
+                      style: text.titleMedium?.copyWith(color: fg)),
+                ),
+                if (note.pinned) ...[
+                  const SizedBox(width: Space.s),
+                  Icon(Icons.push_pin, size: 18, color: fg ?? theme.colorScheme.primary, semanticLabel: tr('Pinned')),
+                ],
+              ]),
+            if ((hasTitle || note.pinned) && hasBody) const SizedBox(height: Space.s),
+            if (hasBody)
+              Text(checklistPreview(note.content).trim(),
+                  maxLines: maxLines,
+                  overflow: TextOverflow.ellipsis,
+                  textDirection: directionOf(note.content),
+                  style: text.bodyMedium?.copyWith(color: fg ?? theme.colorScheme.onSurfaceVariant)),
+          ]),
+        ),
       ),
     );
   }
