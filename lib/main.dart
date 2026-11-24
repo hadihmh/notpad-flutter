@@ -1,34 +1,29 @@
 import 'package:flutter/material.dart';
-import 'ViewControllers/HomePage.dart';
-import 'package:flutter/rendering.dart';
-import './ViewControllers/drower_page.dart';
-import './utils/class_builder.dart';
 
-void main() {
-  ClassBuilder.registerClasses();
-  //debugPaintSizeEnabled=true;
-  //  debugPaintBaselinesEnabled=true;
-  // debugPaintPointersEnabled=true;
-  runApp(MyApp());
+import 'data/settings.dart';
+import 'pages/home_page.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await settings.load();
+  runApp(const NoteApp());
 }
 
-class MyApp extends StatelessWidget {
- 
-  // This widget is the root of your application.
+class NoteApp extends StatelessWidget {
+  const NoteApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        fontFamily: "Roboto",
-        iconTheme: IconThemeData(color: Colors.black),
-        primaryTextTheme: TextTheme(
-          title: TextStyle(color: Colors.black),
-        ),
-        primarySwatch: Colors.blue,
+    return ListenableBuilder(
+      listenable: settings,
+      builder: (context, _) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Note',
+        themeMode: settings.themeMode,
+        theme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.light),
+        darkTheme: ThemeData(colorSchemeSeed: settings.seed, brightness: Brightness.dark),
+        home: const HomePage(),
       ),
-      home: DrawerPage(),
     );
   }
 }

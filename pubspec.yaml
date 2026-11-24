@@ -1,111 +1,34 @@
-name: Note
+name: note
 description: Simple NoteBook
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+publish_to: none
+version: 2.0.0+10
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ^3.5.0
 
 dependencies:
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
-  flutter_staggered_grid_view: ^0.3.0
-  auto_size_text: ^1.1.2
-  sqflite:
-  path:
-  intl: ^0.15.7
-  share: ^0.6.1
-  kf_drawer: ^1.1.1
-  eva_icons_flutter: ^2.0.0
-  material_design_icons_flutter: ^3.2.3695
-  flutter_icons: ^0.1.4
-  line_awesome_icons: ^1.0.4+1
-  toast: ^0.1.4
-  font_awesome_flutter:
-  rxdart: ^0.21.0
-  flutter_masked_text: ^0.8.0
-  beauty_textfield: ^0.0.1
-  direct_select_flutter: ^1.0.3
-  shared_preferences: ^0.5.3+1
-  popup_menu: ^1.0.1
-  flutter_launcher_icons: ^0.7.2+1
-  url_launcher: ^5.1.0
+  sqflite: ^2.4.2
+  path: ^1.9.0
+  shared_preferences: ^2.3.2
+  intl: ^0.20.1
+  url_launcher: ^6.3.1
+  flutter_staggered_grid_view: ^0.7.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.1
 
-flutter_icons:
-  android: "launcher_icon" 
+flutter_launcher_icons:
+  android: launcher_icon
   ios: true
-  image_path: "Assets/logo-grey.png"
-  
-# For information on the generic Dart part of this file, see the
-# following page: https://www.dartlang.org/tools/pub/pubspec
+  remove_alpha_ios: true
+  image_path: Assets/logo-grey.png
 
-# The following section is specific to Flutter.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: Assets/Fonts/Roboto-Regular.ttf
-        - asset: Assets/Fonts/Roboto-Bold.ttf
-
-   ##           weight: 500
-    #        - asset: lib/Assets/Fonts/Roboto-Bold.ttf
-  #            weight: 700
-  #          - asset: Assets/Fonts/Roboto-Light.ttf
-      #        weight: 500
-  #          - asset: Assets/Fonts/Roboto-Regular.ttf
-  # To add assets to your application, add an assets section, like this:
   assets:
-     - Assets/Fonts/Roboto-Regular.ttf
-     - Assets/back.jpg
-     - Assets/logo.jpg
-     - Assets/logo-grey.png
-     - Assets/logo-green.png
-     - Assets/logo-blue.png
-     - Assets/prof.jpg
-     - Assets/myket.png
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.io/assets-and-images/#resolution-aware.
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.io/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-
-
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.io/custom-fonts/#from-packages
+    - Assets/logo-grey.png
