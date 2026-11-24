@@ -24,6 +24,7 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
   late final _originalContent = widget.note.content;
   Note get _note => widget.note;
   Timer? _debounce;
+  final _contentFocus = FocusNode();
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
     _debounce?.cancel();
     _title.dispose();
     _content.dispose();
+    _contentFocus.dispose();
     super.dispose();
   }
 
@@ -186,28 +188,34 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
         body: SafeArea(
           child: Column(children: [
             Expanded(
-              child: ListView(padding: const EdgeInsets.symmetric(horizontal: 20), children: [
-                TextField(
-                  controller: _title,
-                  textDirection: directionOf(_title.text),
-                  textCapitalization: TextCapitalization.sentences,
-                  style: text.headlineSmall?.copyWith(color: fg),
-                  decoration: InputDecoration(
-                      hintText: tr('Title'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
-                  maxLines: null,
-                ),
-                TextField(
-                  controller: _content,
-                  autofocus: _note.id == null,
-                  textDirection: directionOf(_content.text),
-                  textCapitalization: TextCapitalization.sentences,
-                  keyboardType: TextInputType.multiline,
-                  style: TextStyle(fontSize: settings.fontSize, height: 1.5, color: fg),
-                  decoration: InputDecoration(
-                      hintText: tr('Note'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
-                  maxLines: null,
-                ),
-              ]),
+              // Tapping blank space below the text starts typing at the end of the note.
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: _contentFocus.requestFocus,
+                child: ListView(padding: const EdgeInsets.symmetric(horizontal: 20), children: [
+                  TextField(
+                    controller: _title,
+                    textDirection: directionOf(_title.text),
+                    textCapitalization: TextCapitalization.sentences,
+                    style: text.headlineSmall?.copyWith(color: fg),
+                    decoration: InputDecoration(
+                        hintText: tr('Title'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
+                    maxLines: null,
+                  ),
+                  TextField(
+                    controller: _content,
+                    focusNode: _contentFocus,
+                    autofocus: _note.id == null,
+                    textDirection: directionOf(_content.text),
+                    textCapitalization: TextCapitalization.sentences,
+                    keyboardType: TextInputType.multiline,
+                    style: TextStyle(fontSize: settings.fontSize, height: 1.5, color: fg),
+                    decoration: InputDecoration(
+                        hintText: tr('Note'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
+                    maxLines: null,
+                  ),
+                ]),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8),
