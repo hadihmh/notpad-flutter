@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
         onDestinationSelected: (i) {
           if (i < Section.values.length) return _select(Section.values[i]);
           Navigator.pop(context);
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage())).then((_) => _reload());
         },
         children: [
           Padding(

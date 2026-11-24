@@ -51,6 +51,8 @@ class NotesDb {
     await (await _database).delete('notes', where: 'id = ?', whereArgs: [note.id]);
   }
 
+  Future<List<Note>> all() async => (await (await _database).query('notes')).map(Note.fromMap).toList();
+
   Future<void> emptyTrash() async =>
       (await _database).delete('notes', where: 'is_deleted = 1');
 }

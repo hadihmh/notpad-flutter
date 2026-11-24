@@ -29,12 +29,12 @@ String editedLabel(DateTime dt, [DateTime? now]) {
   return tr('Edited {date}', {'date': date});
 }
 
-const _shareChannel = MethodChannel('com.hmh.note/share');
+const platform = MethodChannel('com.hmh.note/platform');
 
 /// Opens the Android share sheet; copies to clipboard where the channel is missing.
 Future<void> shareText(BuildContext context, String text) async {
   try {
-    await _shareChannel.invokeMethod('share', {'text': text});
+    await platform.invokeMethod('share', {'text': text});
   } on MissingPluginException {
     // shortcut: share is Android-only (Bazaar build); add an iOS handler if the app ships on iOS.
     if (context.mounted) await copyText(context, text);

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:url_launcher/url_launcher.dart';
 
+import '../data/backup.dart';
+import '../data/notes_db.dart';
 import '../data/settings.dart';
+import '../utils.dart';
 import '../l10n.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -76,12 +81,25 @@ class SettingsPage extends StatelessWidget {
               onSelectionChanged: (s) => settings.setFont(s.first),
             ),
           ),
+          section('Backup'),
+          ListTile(
+            leading: const Icon(Icons.upload_file_outlined),
+            title: Text(tr('Export backup')),
+            subtitle: Text(tr('Save all notes to a file')),
+            onTap: () => _export(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.restore_page_outlined),
+            title: Text(tr('Restore from backup')),
+            subtitle: Text(tr('Notes already in the app are not duplicated')),
+            onTap: () => _restore(context),
+          ),
           section('About'),
           ListTile(
             leading: ClipRRect(
                 borderRadius: BorderRadius.circular(8), child: Image.asset('Assets/logo-grey.png', width: 40)),
             title: Text(tr('Note')),
-            subtitle: Text(tr('A simple, fast notebook · v{v}', {'v': '2.2'})),
+            subtitle: Text(tr('A simple, fast notebook · v{v}', {'v': '2.3'})),
           ),
           for (final (icon, label, url) in _links)
             ListTile(
@@ -92,5 +110,40 @@ class SettingsPage extends StatelessWidget {
         ]),
       ),
     );
+  }
+}
+
+void _toast(BuildContext context, String message) {
+  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+}
+
+Future<void> _export(BuildContext context) async {
+  final notes = await NotesDb.instance.all();
+  final name = 'note-backup-${DateFormat('yyyy-MM-dd').format(DateTime.now())}.json';
+  try {
+    final saved = await platform.invokeMethod<bool>('saveFile', {'name': name, 'text': exportBackup(notes)});
+    if (saved == true && context.mounted) _toast(context, tr('Backup saved ({n} notes)', {'n': notes.length}));
+  } on Exception {
+    // shortcut: file picker is Android-only (MissingPluginException elsewhere); add iOS if it ships there.
+    if (context.mounted) _toast(context, tr('Could not save the file'));
+  }
+}
+
+Future<void> _restore(BuildContext context) async {
+  try {
+    final text = await platform.invokeMethod<String>('openFile');
+    if (text == null) return; // cancelled
+    final db = NotesDb.instance;
+    final fresh = notesToRestore(await db.all(), parseBackup(text));
+    for (final n in fresh) {
+      await db.save(n);
+    }
+    if (context.mounted) _toast(context, tr('{n} notes restored', {'n': fresh.length}));
+  } on FormatException {
+    if (context.mounted) _toast(context, tr('Not a valid backup file'));
+  } on PlatformException {
+    if (context.mounted) _toast(context, tr('Could not open the file'));
+  } on MissingPluginException {
+    if (context.mounted) _toast(context, tr('Could not open the file'));
   }
 }
