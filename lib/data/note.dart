@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../checklist.dart';
+
 /// A note. Maps 1:1 to the `notes` table created by v1.x so existing data keeps working.
 class Note {
   int? id;
@@ -27,9 +29,9 @@ class Note {
   })  : created = created ?? DateTime.now(),
         edited = edited ?? DateTime.now();
 
-  bool get isEmpty => title.trim().isEmpty && content.trim().isEmpty;
+  bool get isEmpty => title.trim().isEmpty && fromChecklist(content).trim().isEmpty;
 
-  String get shareText => [title, content].where((s) => s.trim().isNotEmpty).join('\n\n');
+  String get shareText => [title, checklistPreview(content)].where((s) => s.trim().isNotEmpty).join('\n\n');
 
   bool matches(String query) {
     final q = query.toLowerCase();
@@ -68,6 +70,5 @@ class Note {
         _ => v.toString(),
       };
 
-  static DateTime _date(Object? v) =>
-      v is int ? DateTime.fromMillisecondsSinceEpoch(v * 1000) : DateTime.now();
+  static DateTime _date(Object? v) => v is int ? DateTime.fromMillisecondsSinceEpoch(v * 1000) : DateTime.now();
 }

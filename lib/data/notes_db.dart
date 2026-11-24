@@ -31,8 +31,7 @@ class NotesDb {
       Section.archive => 'is_archived = 1 AND is_deleted = 0',
       Section.trash => 'is_deleted = 1',
     };
-    final rows = await (await _database)
-        .query('notes', where: where, orderBy: 'is_pinned DESC, date_last_edited DESC');
+    final rows = await (await _database).query('notes', where: where, orderBy: 'is_pinned DESC, date_last_edited DESC');
     return rows.map(Note.fromMap).toList();
   }
 
@@ -53,6 +52,5 @@ class NotesDb {
 
   Future<List<Note>> all() async => (await (await _database).query('notes')).map(Note.fromMap).toList();
 
-  Future<void> emptyTrash() async =>
-      (await _database).delete('notes', where: 'is_deleted = 1');
+  Future<void> emptyTrash() async => (await _database).delete('notes', where: 'is_deleted = 1');
 }

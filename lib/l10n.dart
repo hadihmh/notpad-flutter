@@ -8,9 +8,8 @@ String tr(String en, [Map<String, Object> args = const {}]) {
 }
 
 /// Persian digits in the Persian UI.
-String localDigits(String s) => settings.isFa
-    ? s.replaceAllMapped(RegExp('[0-9]'), (m) => '۰۱۲۳۴۵۶۷۸۹'[int.parse(m[0]!)])
-    : s;
+String localDigits(String s) =>
+    settings.isFa ? s.replaceAllMapped(RegExp('[0-9]'), (m) => '۰۱۲۳۴۵۶۷۸۹'[int.parse(m[0]!)]) : s;
 
 const fa = {
   'Note': 'یادداشت',
@@ -49,6 +48,11 @@ const fa = {
   'Color': 'رنگ',
   'Default color': 'رنگ پیش‌فرض',
   'Undo changes': 'لغو تغییرات',
+  'Show checkboxes': 'نمایش چک‌باکس‌ها',
+  'Hide checkboxes': 'حذف چک‌باکس‌ها',
+  'List item': 'مورد',
+  'Add item': 'افزودن مورد',
+  'Remove item': 'حذف مورد',
   'Title': 'عنوان',
   'Appearance': 'ظاهر',
   'Light': 'روشن',
@@ -102,9 +106,7 @@ const _jalaliMonths = [
     jy += (days - 1) ~/ 365;
     days = (days - 1) % 365;
   }
-  return days < 186
-      ? (jy, 1 + days ~/ 31, 1 + days % 31)
-      : (jy, 7 + (days - 186) ~/ 30, 1 + (days - 186) % 30);
+  return days < 186 ? (jy, 1 + days ~/ 31, 1 + days % 31) : (jy, 7 + (days - 186) ~/ 30, 1 + (days - 186) % 30);
 }
 
 /// "3 Azar" or "3 Azar 1404" in Persian.

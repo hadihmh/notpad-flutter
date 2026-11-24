@@ -49,7 +49,8 @@ class SettingsPage extends StatelessWidget {
             child: SegmentedButton<ThemeMode>(
               segments: [
                 ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_outlined), label: Text(tr('Light'))),
-                ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.brightness_auto_outlined), label: Text(tr('System'))),
+                ButtonSegment(
+                    value: ThemeMode.system, icon: Icon(Icons.brightness_auto_outlined), label: Text(tr('System'))),
                 ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_outlined), label: Text(tr('Dark'))),
               ],
               selected: {settings.themeMode},
@@ -99,7 +100,7 @@ class SettingsPage extends StatelessWidget {
             leading: ClipRRect(
                 borderRadius: BorderRadius.circular(8), child: Image.asset('Assets/logo-grey.png', width: 40)),
             title: Text(tr('Note')),
-            subtitle: Text(tr('A simple, fast notebook · v{v}', {'v': '2.3'})),
+            subtitle: Text(tr('A simple, fast notebook · v{v}', {'v': '2.4'})),
           ),
           for (final (icon, label, url) in _links)
             ListTile(

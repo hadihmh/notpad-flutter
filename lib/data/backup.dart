@@ -52,7 +52,10 @@ List<Note> parseBackup(String text) {
 List<Note> notesToRestore(List<Note> existing, List<Note> incoming) {
   String key(Note n) => '${n.created.millisecondsSinceEpoch ~/ 1000}|${n.title}|${n.content}';
   final seen = existing.map(key).toSet();
-  return [for (final n in incoming) if (seen.add(key(n))) n];
+  return [
+    for (final n in incoming)
+      if (seen.add(key(n))) n
+  ];
 }
 
 DateTime _date(Object? v) => v is int ? DateTime.fromMillisecondsSinceEpoch(v) : DateTime.now();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import '../checklist.dart';
 import '../data/note.dart';
 import '../data/notes_db.dart';
 import '../data/settings.dart';
@@ -292,7 +293,7 @@ class NoteCard extends StatelessWidget {
                     style: text.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w600)),
               if (note.title.trim().isNotEmpty && note.content.trim().isNotEmpty) const SizedBox(height: 6),
               if (note.content.trim().isNotEmpty)
-                Text(note.content.trim(),
+                Text(checklistPreview(note.content).trim(),
                     maxLines: maxLines,
                     overflow: TextOverflow.ellipsis,
                     textDirection: directionOf(note.content),

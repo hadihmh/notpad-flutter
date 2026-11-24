@@ -6,6 +6,7 @@ import '../data/note.dart';
 import '../data/notes_db.dart';
 import '../data/settings.dart';
 import '../l10n.dart';
+import '../checklist.dart';
 import '../utils.dart';
 
 class NotePage extends StatefulWidget {
@@ -25,6 +26,8 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
   Note get _note => widget.note;
   Timer? _debounce;
   final _contentFocus = FocusNode();
+  late bool _checklist = isChecklist(widget.note.content);
+  int _checklistKey = 0; // bump to rebuild the checklist editor from _content
 
   @override
   void initState() {
@@ -99,6 +102,19 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
   void _undoChanges() {
     _title.text = _originalTitle;
     _content.text = _originalContent;
+    setState(() {
+      _checklist = isChecklist(_originalContent);
+      _checklistKey++;
+    });
+  }
+
+  void _toggleChecklist() {
+    final text = _checklist ? fromChecklist(_content.text) : toChecklist(_content.text);
+    setState(() {
+      _checklist = !_checklist;
+      _checklistKey++;
+    });
+    _content.text = text;
   }
 
   void _pickColor() {
@@ -170,10 +186,15 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
               onSelected: (action) => action(),
               itemBuilder: (_) => [
                 PopupMenuItem(
-                    value: () => shareText(context, [_title.text, _content.text].join('\n\n').trim()),
+                    value: _toggleChecklist,
+                    child: ListTile(
+                        leading: Icon(_checklist ? Icons.notes : Icons.checklist),
+                        title: Text(_checklist ? tr('Hide checkboxes') : tr('Show checkboxes')))),
+                PopupMenuItem(
+                    value: () => shareText(context, [_title.text, checklistPreview(_content.text)].join('\n\n').trim()),
                     child: ListTile(leading: const Icon(Icons.share_outlined), title: Text(tr('Share')))),
                 PopupMenuItem(
-                    value: () => copyText(context, [_title.text, _content.text].join('\n\n').trim()),
+                    value: () => copyText(context, [_title.text, checklistPreview(_content.text)].join('\n\n').trim()),
                     child: ListTile(leading: const Icon(Icons.copy_outlined), title: Text(tr('Copy')))),
                 PopupMenuItem(
                     value: _undoChanges,
@@ -191,7 +212,7 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
               // Tapping blank space below the text starts typing at the end of the note.
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: _contentFocus.requestFocus,
+                onTap: _checklist ? null : _contentFocus.requestFocus,
                 child: ListView(padding: const EdgeInsets.symmetric(horizontal: 20), children: [
                   TextField(
                     controller: _title,
@@ -202,18 +223,27 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
                         hintText: tr('Title'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
                     maxLines: null,
                   ),
-                  TextField(
-                    controller: _content,
-                    focusNode: _contentFocus,
-                    autofocus: _note.id == null,
-                    textDirection: directionOf(_content.text),
-                    textCapitalization: TextCapitalization.sentences,
-                    keyboardType: TextInputType.multiline,
-                    style: TextStyle(fontSize: settings.fontSize, height: 1.5, color: fg),
-                    decoration: InputDecoration(
-                        hintText: tr('Note'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
-                    maxLines: null,
-                  ),
+                  if (_checklist)
+                    ChecklistEditor(
+                      key: ValueKey(_checklistKey),
+                      text: _content.text,
+                      onChanged: (t) => _content.text = t,
+                      style: TextStyle(fontSize: settings.fontSize, color: fg),
+                      color: fg,
+                    )
+                  else
+                    TextField(
+                      controller: _content,
+                      focusNode: _contentFocus,
+                      autofocus: _note.id == null,
+                      textDirection: directionOf(_content.text),
+                      textCapitalization: TextCapitalization.sentences,
+                      keyboardType: TextInputType.multiline,
+                      style: TextStyle(fontSize: settings.fontSize, height: 1.5, color: fg),
+                      decoration: InputDecoration(
+                          hintText: tr('Note'), border: InputBorder.none, hintStyle: TextStyle(color: hint)),
+                      maxLines: null,
+                    ),
                 ]),
               ),
             ),

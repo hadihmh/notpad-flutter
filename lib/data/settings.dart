@@ -23,8 +23,7 @@ class AppSettings extends ChangeNotifier {
     final p = _prefs = await SharedPreferences.getInstance();
     themeIndex = _index(p.getString('theme'), 't', 4, 1);
     fontIndex = _index(p.getString('fontsize'), 'f', 3, 1);
-    themeMode = ThemeMode.values.firstWhere((m) => m.name == p.getString('theme_mode'),
-        orElse: () => ThemeMode.system);
+    themeMode = ThemeMode.values.firstWhere((m) => m.name == p.getString('theme_mode'), orElse: () => ThemeMode.system);
     gridView = p.getBool('grid_view') ?? true;
     lang = p.getString('lang') == 'en' ? 'en' : 'fa';
   }
