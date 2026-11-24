@@ -76,8 +76,14 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
     await _save(force: true);
   }
 
+  Future<void> _togglePin() async {
+    setState(() => _note.pinned = !_note.pinned);
+    await _save(force: true);
+  }
+
   Future<void> _toggleArchive() async {
     _note.archived = !_note.archived;
+    _note.pinned = false;
     await _save(force: true);
     if (mounted) Navigator.pop(context);
   }
@@ -146,6 +152,12 @@ class _NotePageState extends State<NotePage> with WidgetsBindingObserver {
           backgroundColor: bg,
           foregroundColor: fg,
           actions: [
+            if (!_note.archived)
+              IconButton(
+                tooltip: _note.pinned ? tr('Unpin') : tr('Pin'),
+                icon: Icon(_note.pinned ? Icons.push_pin : Icons.push_pin_outlined),
+                onPressed: _togglePin,
+              ),
             IconButton(tooltip: tr('Color'), icon: const Icon(Icons.palette_outlined), onPressed: _pickColor),
             IconButton(
               tooltip: _note.archived ? tr('Unarchive') : tr('Archive'),

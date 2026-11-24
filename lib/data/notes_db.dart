@@ -11,14 +11,18 @@ class NotesDb {
 
   Database? _db;
 
-  // Same file name and schema as v1.x, so updating from Bazaar keeps every note.
+  // Same file name and table as v1.x, so updating from Bazaar keeps every note.
+  // Schema v2 adds is_pinned.
   Future<Database> get _database async => _db ??= await openDatabase(
         join(await getDatabasesPath(), 'notes.db'),
-        version: 1,
+        version: 2,
         onCreate: (db, _) => db.execute('CREATE TABLE IF NOT EXISTS notes('
             'id INTEGER PRIMARY KEY AUTOINCREMENT, title BLOB, content BLOB, '
             'date_created INTEGER, date_last_edited INTEGER, note_color INTEGER, '
-            'is_archived INTEGER, is_deleted INTEGER)'),
+            'is_archived INTEGER, is_deleted INTEGER, is_pinned INTEGER NOT NULL DEFAULT 0)'),
+        onUpgrade: (db, from, _) async {
+          if (from < 2) await db.execute('ALTER TABLE notes ADD COLUMN is_pinned INTEGER NOT NULL DEFAULT 0');
+        },
       );
 
   Future<List<Note>> list(Section section) async {
@@ -28,7 +32,7 @@ class NotesDb {
       Section.trash => 'is_deleted = 1',
     };
     final rows = await (await _database)
-        .query('notes', where: where, orderBy: 'date_last_edited DESC');
+        .query('notes', where: where, orderBy: 'is_pinned DESC, date_last_edited DESC');
     return rows.map(Note.fromMap).toList();
   }
 

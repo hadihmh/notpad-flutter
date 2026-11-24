@@ -61,16 +61,36 @@ class _HomePageState extends State<HomePage> {
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
         content: Text(tr(message)),
-        action: SnackBarAction(label: tr('Undo'), onPressed: () async {
-          undo();
-          await _db.save(note);
-          _reload();
-        }),
+        action: SnackBarAction(
+            label: tr('Undo'),
+            onPressed: () async {
+              undo();
+              await _db.save(note);
+              _reload();
+            }),
       ));
   }
 
-  void _toggleArchive(Note n) => _update(n, () => n.archived = !n.archived,
-      n.archived ? 'Note unarchived' : 'Note archived', () => n.archived = !n.archived);
+  void _toggleArchive(Note n) {
+    final wasPinned = n.pinned;
+    _update(
+        n,
+        () {
+          n.archived = !n.archived;
+          n.pinned = false; // archived notes are never pinned
+        },
+        n.archived ? 'Note unarchived' : 'Note archived',
+        () {
+          n.archived = !n.archived;
+          n.pinned = wasPinned;
+        });
+  }
+
+  Future<void> _togglePin(Note n) async {
+    n.pinned = !n.pinned;
+    await _db.save(n);
+    _reload();
+  }
 
   void _trash(Note n) => _update(n, () => n.deleted = true, 'Note moved to trash', () => n.deleted = false);
 
@@ -123,8 +143,11 @@ class _HomePageState extends State<HomePage> {
               item(Icons.restore_from_trash_outlined, 'Restore', () => _restore(n)),
               item(Icons.delete_forever_outlined, 'Delete forever', () => _deleteForever(n)),
             ] else ...[
-              item(n.archived ? Icons.unarchive_outlined : Icons.archive_outlined,
-                  n.archived ? 'Unarchive' : 'Archive', () => _toggleArchive(n)),
+              if (!n.archived)
+                item(n.pinned ? Icons.push_pin : Icons.push_pin_outlined, n.pinned ? 'Unpin' : 'Pin',
+                    () => _togglePin(n)),
+              item(n.archived ? Icons.unarchive_outlined : Icons.archive_outlined, n.archived ? 'Unarchive' : 'Archive',
+                  () => _toggleArchive(n)),
               item(Icons.share_outlined, 'Share', () => shareText(context, n.shareText)),
               item(Icons.copy_outlined, 'Copy', () => copyText(context, n.shareText)),
               item(Icons.delete_outline, 'Move to trash', () => _trash(n)),
@@ -182,7 +205,8 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => setState(settings.toggleGrid),
           ),
           if (_section == Section.trash)
-            IconButton(tooltip: tr('Empty trash'), icon: const Icon(Icons.delete_sweep_outlined), onPressed: _emptyTrash),
+            IconButton(
+                tooltip: tr('Empty trash'), icon: const Icon(Icons.delete_sweep_outlined), onPressed: _emptyTrash),
         ],
       ),
       floatingActionButton: _section == Section.notes
@@ -250,24 +274,32 @@ class NoteCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            if (note.title.trim().isNotEmpty)
-              Text(note.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textDirection: directionOf(note.title),
-                  style: text.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w600)),
-            if (note.title.trim().isNotEmpty && note.content.trim().isNotEmpty) const SizedBox(height: 6),
-            if (note.content.trim().isNotEmpty)
-              Text(note.content.trim(),
-                  maxLines: maxLines,
-                  overflow: TextOverflow.ellipsis,
-                  textDirection: directionOf(note.content),
-                  style: text.bodyMedium?.copyWith(color: fg)),
-          ]),
-        ),
+        child: Stack(children: [
+          if (note.pinned)
+            PositionedDirectional(
+              top: 8,
+              end: 8,
+              child: Icon(Icons.push_pin, size: 16, color: fg, semanticLabel: tr('Pinned')),
+            ),
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(14, 14, note.pinned ? 28 : 14, 14),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              if (note.title.trim().isNotEmpty)
+                Text(note.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textDirection: directionOf(note.title),
+                    style: text.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w600)),
+              if (note.title.trim().isNotEmpty && note.content.trim().isNotEmpty) const SizedBox(height: 6),
+              if (note.content.trim().isNotEmpty)
+                Text(note.content.trim(),
+                    maxLines: maxLines,
+                    overflow: TextOverflow.ellipsis,
+                    textDirection: directionOf(note.content),
+                    style: text.bodyMedium?.copyWith(color: fg)),
+            ]),
+          ),
+        ]),
       ),
     );
   }

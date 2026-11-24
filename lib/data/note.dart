@@ -10,6 +10,7 @@ class Note {
   int color; // ARGB
   bool archived;
   bool deleted;
+  bool pinned;
 
   static const white = 0xffffffff;
 
@@ -22,6 +23,7 @@ class Note {
     this.color = white,
     this.archived = false,
     this.deleted = false,
+    this.pinned = false,
   })  : created = created ?? DateTime.now(),
         edited = edited ?? DateTime.now();
 
@@ -44,6 +46,7 @@ class Note {
         color: (m['note_color'] as int?) ?? white,
         archived: m['is_archived'] == 1,
         deleted: m['is_deleted'] == 1,
+        pinned: m['is_pinned'] == 1,
       );
 
   Map<String, Object?> toMap() => {
@@ -55,6 +58,7 @@ class Note {
         'note_color': color,
         'is_archived': archived ? 1 : 0,
         'is_deleted': deleted ? 1 : 0,
+        'is_pinned': pinned ? 1 : 0,
       };
 
   static String _text(Object? v) => switch (v) {

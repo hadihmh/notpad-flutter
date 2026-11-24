@@ -81,7 +81,7 @@ class SettingsPage extends StatelessWidget {
             leading: ClipRRect(
                 borderRadius: BorderRadius.circular(8), child: Image.asset('Assets/logo-grey.png', width: 40)),
             title: Text(tr('Note')),
-            subtitle: Text(tr('A simple, fast notebook · v{v}', {'v': '2.1'})),
+            subtitle: Text(tr('A simple, fast notebook · v{v}', {'v': '2.2'})),
           ),
           for (final (icon, label, url) in _links)
             ListTile(
